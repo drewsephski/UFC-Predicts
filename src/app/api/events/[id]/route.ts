@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/prisma";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import type { Prisma } from "@prisma/client"; // Assuming this import is still needed for the type assertion
 import type { Fight, Event } from '@/contexts/ufc-context';
 
 export async function GET(

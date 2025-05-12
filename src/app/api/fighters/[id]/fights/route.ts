@@ -1,5 +1,6 @@
 import { db } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import type { Prisma } from "@prisma/client";
 
 export async function GET(
   req: NextRequest,
@@ -41,9 +42,6 @@ export async function GET(
           }
         }
       },
-      orderBy: {
-        date: 'desc'
-      }
     });
     
     return NextResponse.json(fights);
