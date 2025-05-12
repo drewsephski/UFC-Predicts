@@ -1,17 +1,16 @@
+
 "use client"
 
 import React from 'react'
-import { ArrowDownIcon, MessageSquareIcon } from "lucide-react";
-import { ArrowUpIcon, BarChart3Icon, Share2Icon } from "lucide-react";
-import { Button } from '@/components/ui/button';
+import { ArrowDownIcon, ArrowUpIcon, BarChart3Icon, MessageSquareIcon, Share2Icon, UsersIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { UsersIcon } from "lucide-react";
-// import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 import { ANALYTICS_DATA, RECENT_SALES } from "@/constants/dashboard";
 
-import {
+import type {
     ChartConfig,
+} from "@/components/ui/chart"
+import {
     ChartContainer,
     ChartTooltip,
     ChartTooltipContent,
@@ -29,7 +28,7 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-const Page = () => {
+export default function Page() {
     return (
         <div className="p-4 w-full">
             <div className="flex flex-col w-full">
@@ -172,7 +171,7 @@ const Page = () => {
                         </Card>
                     </Container>
 
-                    {/* Activities */}
+                    {/* Recent Sales */}
                     <Container delay={0.3} className="col-span-2">
                         <Card>
                             <CardHeader>
@@ -200,6 +199,44 @@ const Page = () => {
             </div>
         </div>
     )
-};
+}
 
-export default Page
+// Define the Fighter type
+interface Fighter {
+  id: string;
+  name: string;
+  nickname?: string;
+  division: string;
+  record: string;
+  country?: string;
+  age?: number;
+  height?: string;
+  weight?: string;
+  reach?: string;
+  stance?: string;
+  isChampion: boolean;
+  imageUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Export the fetchFighters function
+export async function fetchFighters(): Promise<Fighter[]> {
+  try {
+    const response = await fetch('https://api.sportsdata.io/v3/mma/stats/json/Fighters?key=7fe7fb099e6a482e8c83febaa699e36d', {
+      // cache: 'no-store', // If you want fresh data on every request during development
+      next: { revalidate: 3600 } // Revalidate data every hour, as per API call interval
+    });
+    if (!response.ok) {
+      // Log more details for server-side debugging
+      const errorText = await response.text();
+      console.error(`API Error: ${response.status} ${response.statusText}`, errorText);
+      throw new Error(`Failed to fetch fighters. Status: ${response.status}`);
+    }
+    const data: Fighter[] = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching fighters:", error);
+    return []; // Return empty array or handle error as appropriate
+  }
+}

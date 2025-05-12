@@ -24,7 +24,7 @@ const DashboardSidebar = () => {
     return (
         <div
             id="sidebar"
-            className="flex-col hidden lg:flex fixed left-0 top-16 bottom-0 z-50 bg-background border-r border-border/50 w-72"
+            className="flex-col hidden lg:flex fixed left-0 top-16 bottom-0 z-50 bg-gradient-to-b from-black to-red-950/30 border-r border-red-500/30 w-72"
         >
             <div className={cn(
                 "flex flex-col size-full p-3"
@@ -32,15 +32,15 @@ const DashboardSidebar = () => {
                 <Container delay={0.2} className="h-max">
                     <Button
                         variant="outline"
-                        className="w-full justify-between px-2"
+                        className="w-full justify-between px-2 border-red-500/50 bg-black/50 hover:bg-red-950/30 text-gray-300"
                     >
-                        <span className="flex items-center gap-x-1 text-foreground/80">
-                            <SearchIcon className="size-4" />
+                        <span className="flex items-center gap-x-1 text-gray-300">
+                            <SearchIcon className="size-4 text-red-400" />
                             <span className="text-sm">
-                                Search...
+                                Search UFC Content...
                             </span>
                         </span>
-                        <span className="px-1 py-px text-xs rounded-sm bg-muted text-muted-foreground">
+                        <span className="px-1 py-px text-xs rounded-sm bg-red-950/50 text-gray-300 border border-red-500/30">
                             ⌘K
                         </span>
                     </Button>
@@ -51,16 +51,18 @@ const DashboardSidebar = () => {
                         const isActive = pathname === link.href;
 
                         return (
-                            <li key={index} className="w-full">
+                            <li key={link.href} className="w-full">
                                 <Container delay={0.1 + index / 10}>
                                     <Link
                                         href={link.href}
                                         className={buttonVariants({
                                             variant: "ghost",
-                                            className: isActive ? "bg-muted text-primary w-full !justify-start" : "text-foreground/70 w-full !justify-start",
+                                            className: isActive
+                                                ? "bg-red-950/40 text-red-400 border-l-2 border-red-500 w-full !justify-start"
+                                                : "text-gray-300 hover:text-white hover:bg-red-950/20 w-full !justify-start",
                                         })}
                                     >
-                                        <link.icon strokeWidth={2} className="size-[18px] mr-1.5" />
+                                        <link.icon strokeWidth={2} className={`size-[18px] mr-1.5 ${isActive ? 'text-red-400' : 'text-gray-400'}`} />
                                         {link.label}
                                     </Link>
                                 </Container>
@@ -74,9 +76,9 @@ const DashboardSidebar = () => {
                             <Button
                                 variant="ghost"
                                 onClick={handleLogout}
-                                className="w-full justify-start"
+                                className="w-full justify-start text-gray-300 hover:text-white hover:bg-red-950/20 border-t border-red-500/20 rounded-none rounded-b-md"
                             >
-                                <LogOutIcon className="size-4 mr-1.5" />
+                                <LogOutIcon className="size-4 mr-1.5 text-red-400" />
                                 Logout
                             </Button>
                         </div>

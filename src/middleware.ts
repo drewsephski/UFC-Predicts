@@ -1,6 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
+// Use the createRouteMatcher for custom route handling
 const isProtectedRoute = createRouteMatcher(["/app(.*)"]);
 const isPublicRoute = createRouteMatcher(["/", "/marketing(.*)"]);
 const isAuthRoute = createRouteMatcher(["/auth(.*)"]);

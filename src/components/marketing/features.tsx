@@ -14,10 +14,10 @@ const Features = () => {
                 <div className="flex flex-col items-center text-center max-w-2xl mx-auto">
                     <SectionBadge title="Features" />
                     <h2 className="text-2xl md:text-4xl lg:text-5xl font-heading font-medium !leading-snug mt-6">
-                        Create content faster <br /> and smarter
+                        UFC Fight Analysis <br /> and Predictions
                     </h2>
                     <p className="text-base md:text-lg text-center text-accent-foreground/80 mt-6">
-                        Transform your social media strategy with Luro AI&apos;s cutting-edge features, designed to optimize your content creation and engagement like never before.
+                        Get data-driven UFC fight predictions and comprehensive fighter statistics with our advanced analytics platform, designed to give you the edge in understanding matchups and fighter performance.
                     </p>
                 </div>
             </Container>
@@ -40,10 +40,10 @@ const Features = () => {
                                     </div>
                                     <div className="flex flex-col">
                                         <h4 className="text-xl font-heading font-medium heading ">
-                                            Get advanced analytics
+                                            Fighter Statistics
                                         </h4>
                                         <p className="text-sm md:text-base mt-2 text-muted-foreground">
-                                            Track your performance with detailed analytics and optimize to get better results.
+                                            Access comprehensive statistics for all UFC fighters, including striking accuracy, takedown defense, and submission rates.
                                         </p>
                                     </div>
                                 </div>
@@ -56,14 +56,14 @@ const Features = () => {
                                 <div className="bento-card w-full flex-row gap-6">
                                     <div className="w-full h-52 relative">
                                         <Images.ideation className="w-full h-full" />
-                                        <div className="w-40 h-40 rounded-full bg-primary/10 blur-3xl -z-10 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+                                        <div className="w-40 h-40 rounded-full bg-primary/10 blur-3xl -z-10 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
                                     </div>
                                     <div className="flex flex-col mt-auto">
                                         <h4 className="text-xl font-heading font-medium heading">
-                                            Content ideation
+                                            Fight Predictions
                                         </h4>
                                         <p className="text-sm md:text-base mt-2 text-muted-foreground">
-                                            Generate ideas for your content with our AI-powered tools to create engaging posts in seconds.
+                                            Get data-driven predictions for upcoming UFC fights based on comprehensive fighter analysis and historical performance.
                                         </p>
                                     </div>
                                 </div>
@@ -73,7 +73,7 @@ const Features = () => {
                                     <div className="bento-card w-full relative items-center justify-center">
                                         <div className="w-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                                             <p className="text-base text-muted-foreground text-justify [mask-image:radial-gradient(50%_50%_at_50%_50%,#BAB3FF_0%,rgba(186,179,255,0)_90.69%)]">
-                                                We use AI to help you create content that resonates with your audience. Our tools are designed to optimize your content creation and engagement like never before. Transform your social media strategy with Luro AI&apos;s cutting-edge features. Reach your audience with the right message at the right time. Create content faster and smarter with Luro AI. Transform your social media strategy with Luro AI&apos;s cutting-edge features. Create content faster and smarter with Luro AI. Transform your social media strategy with Luro AI&apos;s cutting-edge features. Create content faster and smarter with Luro AI.
+                                                Our UFC fight prediction platform uses advanced statistical analysis to provide accurate predictions for upcoming fights. We analyze fighter statistics, historical performance, matchup styles, and many other factors to give you the edge in understanding how fights might unfold. Whether you're a casual fan or a serious analyst, our platform offers valuable insights into fighter strengths, weaknesses, and potential outcomes. Stay ahead of the curve with our comprehensive UFC analytics and prediction tools. Make more informed decisions about the fights you watch and enjoy a deeper understanding of the sport's technical aspects.
                                             </p>
                                         </div>
                                         <div className="w-full h-16 relative">
@@ -98,10 +98,10 @@ const Features = () => {
                                 <div className="bento-card w-full flex-row gap-6">
                                     <div className="flex flex-col mb-auto">
                                         <h4 className="text-xl font-heading font-medium heading ">
-                                            Seamless integrations
+                                            Fighter Comparison
                                         </h4>
                                         <p className="text-sm md:text-base mt-2 text-muted-foreground">
-                                            Connect your favorite tools and platforms to streamline your workflow and save time.
+                                            Compare any two UFC fighters head-to-head with detailed statistical breakdowns and matchup analysis.
                                         </p>
                                     </div>
                                     <div className="w-full h-28 relative">
@@ -121,10 +121,10 @@ const Features = () => {
                                     </div>
                                     <div className="flex flex-col mt-auto">
                                         <h4 className="text-xl font-heading font-medium heading ">
-                                            Image generation with AI
+                                            UFC Event Calendar
                                         </h4>
                                         <p className="text-sm md:text-base mt-2 text-muted-foreground">
-                                            Create stunning images with AI-powered tools in seconds.
+                                            Stay up-to-date with all upcoming UFC events, fight cards, and matchups in one convenient calendar.
                                         </p>
                                     </div>
                                 </div>
@@ -136,10 +136,10 @@ const Features = () => {
                                     </div>
                                     <div className="flex flex-col mt-auto">
                                         <h4 className="text-xl font-heading font-medium heading ">
-                                            Hashtags suggestions
+                                            UFC Rankings
                                         </h4>
                                         <p className="text-sm md:text-base mt-2 text-muted-foreground">
-                                            Get hashtag suggestions based on your content and audience to increase your reach and engagement.
+                                            Access current and historical UFC rankings across all weight divisions, including pound-for-pound lists.
                                         </p>
                                     </div>
                                 </div>

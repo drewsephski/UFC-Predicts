@@ -5,6 +5,7 @@ import Icons from "../global/icons";
 import Wrapper from "../global/wrapper";
 import { Button } from "../ui/button";
 import { Particles } from "../ui/particles";
+import { ArrowUp } from "lucide-react";
 
 const Footer = () => {
     return (
@@ -68,6 +69,10 @@ const Footer = () => {
                         </Link>
                         <Link href="#" className="p-1">
                             <Icons.discord className="w-5 h-5 text-muted-foreground hover:text-secondary-foreground" />
+                        </Link>
+                        <Link href="#home" className="p-1 ml-2 flex items-center gap-1 text-sm text-muted-foreground hover:text-secondary-foreground">
+                            <ArrowUp className="w-4 h-4" />
+                            <span>Top</span>
                         </Link>
                     </div>
                 </Wrapper>

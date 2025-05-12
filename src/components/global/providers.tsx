@@ -1,22 +1,28 @@
 "use client";
 
-import React from "react"
+import type React from "react"
 import { ClerkProvider } from "@clerk/nextjs"
-// import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider } from "next-themes"
+import { UFCProvider } from "@/contexts/ufc-context"
 
 interface Props {
     children: React.ReactNode;
 }
 
-// const client = new QueryClient();
-
 const Providers = ({ children }: Props) => {
     return (
-        // <QueryClientProvider client={client}>
         <ClerkProvider>
-            {children}
+            <ThemeProvider
+                attribute="class"
+                defaultTheme="dark"
+                enableSystem
+                disableTransitionOnChange
+            >
+                <UFCProvider>
+                    {children}
+                </UFCProvider>
+            </ThemeProvider>
         </ClerkProvider>
-        // </QueryClientProvider> 
     );
 };
 

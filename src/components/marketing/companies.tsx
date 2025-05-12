@@ -5,8 +5,8 @@ const Companies = () => {
     return (
         <div className="flex w-full py-20">
             <div className="flex flex-col items-center justify-center text-center w-full py-2">
-                <h2 className="text-xl heading">
-                    Companies that trust us
+                <h2 className="text-xl heading text-red-500 font-bold">
+                    Official UFC Partners
                 </h2>
                 <div className="mt-16 w-full relative overflow-hidden">
                     <Marquee pauseOnHover className="[--duration:30s]">
@@ -23,8 +23,8 @@ const Companies = () => {
                             <Images.company10 className="w-24 h-8" />
                         </div>
                     </Marquee>
-                    <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-background"></div>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-background"></div>
+                    <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-background to-transparent" />
+                    <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-background to-transparent" />
                 </div>
             </div>
         </div>

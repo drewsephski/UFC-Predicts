@@ -19,12 +19,39 @@ import Reviews from "./marketing/reviews";
 import CTA from "./marketing/cta";
 import Footer from "./marketing/footer";
 
+// Import UFC components directly
+import { FighterCard } from "./fighters/fighter-card";
+import { FighterStats } from "./fighters/fighter-stats";
+import { FighterFightHistory } from "./fighters/fighter-fight-history";
+import { FighterPredictionForm } from "./fighters/fighter-prediction-form";
+import { FightCard } from "./events/fight-card";
+import { FightPredictionForm } from "./events/fight-prediction-form";
+import { EventCard } from "./events/event-card";
+import { LoadingState, ErrorState } from "./ui/loading-state";
+
+// Import navigation components
+import { Breadcrumb } from "./ui/breadcrumb";
+import { PaginationNav } from "./ui/pagination-nav";
+import { BackToTop } from "./ui/back-to-top";
+import { HeaderDropdown } from "./ui/header-dropdown";
+
+// Import sitemap components
+import { Sitemap, SitemapCategory } from "./sitemap/sitemap";
+
 export {
+    // Global components
     Icons,
     Images,
     Wrapper,
     Container,
     Background,
+    Providers,
+
+    // Auth components
+    SignInForm,
+    SignUpForm,
+
+    // Marketing components
     Hero,
     Navbar,
     Companies,
@@ -35,7 +62,25 @@ export {
     Reviews,
     CTA,
     Footer,
-    SignInForm,
-    SignUpForm,
-    Providers,
+
+    // UFC components
+    FighterCard,
+    FighterStats,
+    FighterFightHistory,
+    FighterPredictionForm,
+    FightCard,
+    FightPredictionForm,
+    EventCard,
+    LoadingState,
+    ErrorState,
+
+    // Navigation components
+    Breadcrumb,
+    PaginationNav,
+    BackToTop,
+    HeaderDropdown,
+
+    // Sitemap components
+    Sitemap,
+    SitemapCategory,
 };

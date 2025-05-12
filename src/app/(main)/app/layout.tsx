@@ -1,6 +1,10 @@
+"use client";
+
 import DashboardNavbar from "@/components/dashboard/dashboard-navbar";
 import DashboardSidebar from "@/components/dashboard/dashboard-sidebar";
-import React from 'react';
+import { BackToTop } from "@/components/ui/back-to-top";
+import { FloatingDock } from "@/components/magicui/dock";
+import type React from "react";
 
 interface Props {
     children: React.ReactNode;
@@ -16,6 +20,8 @@ const DashboardLayout = ({ children }: Props) => {
                     {children}
                 </div>
             </main>
+            <BackToTop threshold={300} position="bottom-right" />
+            <FloatingDock showLabels={false} />
         </div>
     );
 };

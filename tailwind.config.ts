@@ -1,14 +1,12 @@
+
 import type { Config } from "tailwindcss"
-
-const svgToDataUri = require("mini-svg-data-uri");
-
-const colors = require("tailwindcss/colors");
-const {
-  default: flattenColorPalette,
-} = require("tailwindcss/lib/util/flattenColorPalette");
+// @ts-ignore
+import svgToDataUri from "mini-svg-data-uri";
+import colors from "tailwindcss/colors";
+import flattenColorPalette from "tailwindcss/lib/util/flattenColorPalette";
 
 const config = {
-  darkMode: ["class"],
+  darkMode: "class",
   content: [
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
@@ -63,6 +61,24 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // UFC theme colors - red, gray, black
+        ufc: {
+          red: {
+            DEFAULT: "#D20A0A",
+            light: "#FF1A1A",
+            dark: "#A30808",
+          },
+          gray: {
+            DEFAULT: "#333333",
+            light: "#555555",
+            dark: "#222222",
+          },
+          black: {
+            DEFAULT: "#0A0A0A",
+            light: "#1A1A1A",
+            dark: "#000000",
+          }
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -106,6 +122,14 @@ const config = {
           "to": {
             transform: "rotate(360deg)"
           },
+        },
+        "float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        "pulse-glow": {
+          "0%, 100%": { opacity: "0.6", boxShadow: "0 0 5px rgba(210, 10, 10, 0.5)" },
+          "50%": { opacity: "1", boxShadow: "0 0 20px rgba(210, 10, 10, 0.8)" },
         }
       },
       animation: {
@@ -117,9 +141,15 @@ const config = {
         "ripple": "ripple var(--duration,2s) ease calc(var(--i, 0)*.2s) infinite",
         "spotlight": "spotlight 2s ease .75s 1 forwards",
         "loading": "loading 0.6s linear infinite",
+        "float": "float 3s ease-in-out infinite",
+        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
       },
       spacing: {
         "1/8": "12.5%",
+      },
+      backgroundImage: {
+        'ufc-gradient': 'linear-gradient(to right, #D20A0A, #333333, #0A0A0A)',
+        'ufc-gradient-vertical': 'linear-gradient(to bottom, #D20A0A, #333333, #0A0A0A)',
       },
     },
   },
@@ -127,20 +157,20 @@ const config = {
     addVariablesForColors,
     require("tailwindcss-animate"),
     require("tailwind-scrollbar-hide"),
-    function ({ matchUtilities, theme }: any) {
+    ({ matchUtilities, theme }: { matchUtilities: any, theme: any }) => {
       matchUtilities(
         {
-          "bg-grid": (value: any) => ({
+          "bg-grid": (value: string) => ({
             backgroundImage: `url("${svgToDataUri(
               `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="${value}"><path d="M0 .5H31.5V32"/></svg>`
             )}")`,
           }),
-          "bg-grid-small": (value: any) => ({
+          "bg-grid-small": (value: string) => ({
             backgroundImage: `url("${svgToDataUri(
               `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="8" height="8" fill="none" stroke="${value}"><path d="M0 .5H31.5V32"/></svg>`
             )}")`,
           }),
-          "bg-dot": (value: any) => ({
+          "bg-dot": (value: string) => ({
             backgroundImage: `url("${svgToDataUri(
               `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="16" height="16" fill="none"><circle fill="${value}" id="pattern-circle" cx="10" cy="10" r="1.6257413380501518"></circle></svg>`
             )}")`,
@@ -152,15 +182,20 @@ const config = {
   ],
 } satisfies Config;
 
-function addVariablesForColors({ addBase, theme }: any) {
-  let allColors = flattenColorPalette(theme("colors"));
-  let newVars = Object.fromEntries(
+type AddBaseProps = {
+  addBase: (base: Record<string, any>) => void;
+  theme: (path: string) => Record<string, string>;
+};
+
+function addVariablesForColors({ addBase, theme }: AddBaseProps) {
+  const allColors = flattenColorPalette(theme("colors"));
+  const newVars = Object.fromEntries(
     Object.entries(allColors).map(([key, val]) => [`--${key}`, val])
   );
 
   addBase({
     ":root": newVars,
   });
-};
+}
 
 export default config

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="octagonGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#000000;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a1a1a;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="spotlightGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#000000;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="url(#octagonGradient)" />
+  
+  <!-- Crowd silhouette -->
+  <path d="M0,1080 L1920,1080 L1920,800 C1800,780 1700,820 1600,800 C1500,780 1400,760 1300,770 C1200,780 1100,800 1000,790 C900,780 800,760 700,770 C600,780 500,800 400,790 C300,780 200,760 100,780 L0,800 Z" fill="#111111" />
+  
+  <!-- Octagon -->
+  <polygon points="960,300 1160,400 1160,600 960,700 760,600 760,400" 
+           stroke="#ff0000" stroke-width="8" fill="none" />
+  
+  <!-- Octagon floor -->
+  <polygon points="960,300 1160,400 1160,600 960,700 760,600 760,400" 
+           fill="#333333" fill-opacity="0.7" />
+  
+  <!-- UFC Logo -->
+  <text x="960" y="520" font-family="Arial, sans-serif" font-size="80" font-weight="bold" fill="#ff0000" text-anchor="middle">UFC</text>
+  
+  <!-- Cage fence pattern -->
+  <g stroke="#666666" stroke-width="2" opacity="0.5">
+    <!-- Vertical lines -->
+    <line x1="760" y1="400" x2="760" y2="600" />
+    <line x1="800" y1="380" x2="800" y2="620" />
+    <line x1="840" y1="360" x2="840" y2="640" />
+    <line x1="880" y1="340" x2="880" y2="660" />
+    <line x1="920" y1="320" x2="920" y2="680" />
+    <line x1="960" y1="300" x2="960" y2="700" />
+    <line x1="1000" y1="320" x2="1000" y2="680" />
+    <line x1="1040" y1="340" x2="1040" y2="660" />
+    <line x1="1080" y1="360" x2="1080" y2="640" />
+    <line x1="1120" y1="380" x2="1120" y2="620" />
+    <line x1="1160" y1="400" x2="1160" y2="600" />
+    
+    <!-- Horizontal lines -->
+    <line x1="760" y1="400" x2="1160" y2="400" />
+    <line x1="760" y1="440" x2="1160" y2="440" />
+    <line x1="760" y1="480" x2="1160" y2="480" />
+    <line x1="760" y1="520" x2="1160" y2="520" />
+    <line x1="760" y1="560" x2="1160" y2="560" />
+    <line x1="760" y1="600" x2="1160" y2="600" />
+  </g>
+  
+  <!-- Spotlight effect -->
+  <circle cx="960" cy="500" r="400" fill="url(#spotlightGradient)" />
+  
+  <!-- Crowd dots representing people -->
+  <g fill="#222222">
+    <circle cx="100" cy="850" r="5" />
+    <circle cx="150" cy="870" r="5" />
+    <circle cx="200" cy="860" r="5" />
+    <circle cx="250" cy="880" r="5" />
+    <circle cx="300" cy="850" r="5" />
+    <circle cx="350" cy="870" r="5" />
+    <circle cx="400" cy="860" r="5" />
+    <circle cx="450" cy="880" r="5" />
+    <circle cx="500" cy="850" r="5" />
+    <circle cx="550" cy="870" r="5" />
+    <circle cx="600" cy="860" r="5" />
+    <circle cx="650" cy="880" r="5" />
+    <circle cx="700" cy="850" r="5" />
+    <circle cx="750" cy="870" r="5" />
+    <circle cx="800" cy="860" r="5" />
+    <circle cx="850" cy="880" r="5" />
+    <circle cx="900" cy="850" r="5" />
+    <circle cx="950" cy="870" r="5" />
+    <circle cx="1000" cy="860" r="5" />
+    <circle cx="1050" cy="880" r="5" />
+    <circle cx="1100" cy="850" r="5" />
+    <circle cx="1150" cy="870" r="5" />
+    <circle cx="1200" cy="860" r="5" />
+    <circle cx="1250" cy="880" r="5" />
+    <circle cx="1300" cy="850" r="5" />
+    <circle cx="1350" cy="870" r="5" />
+    <circle cx="1400" cy="860" r="5" />
+    <circle cx="1450" cy="880" r="5" />
+    <circle cx="1500" cy="850" r="5" />
+    <circle cx="1550" cy="870" r="5" />
+    <circle cx="1600" cy="860" r="5" />
+    <circle cx="1650" cy="880" r="5" />
+    <circle cx="1700" cy="850" r="5" />
+    <circle cx="1750" cy="870" r="5" />
+    <circle cx="1800" cy="860" r="5" />
+    <circle cx="1850" cy="880" r="5" />
+  </g>
+  
+  <!-- Arena lights -->
+  <g fill="#ffffff" opacity="0.8">
+    <circle cx="700" cy="200" r="3" />
+    <circle cx="750" cy="180" r="3" />
+    <circle cx="800" cy="160" r="3" />
+    <circle cx="850" cy="140" r="3" />
+    <circle cx="900" cy="120" r="3" />
+    <circle cx="950" cy="100" r="3" />
+    <circle cx="1000" cy="100" r="3" />
+    <circle cx="1050" cy="120" r="3" />
+    <circle cx="1100" cy="140" r="3" />
+    <circle cx="1150" cy="160" r="3" />
+    <circle cx="1200" cy="180" r="3" />
+    <circle cx="1250" cy="200" r="3" />
+  </g>
+</svg>

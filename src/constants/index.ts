@@ -5,6 +5,7 @@ import { PLANS } from "./plans";
 import { REVIEWS } from "./reviews";
 import { FOOTER_LINKS } from "./links";
 import { LIST_ITEM_VARIANTS, CHILD_VARIANTS, FADE_IN_VARIANTS, MODAL_VARIANTS } from "./animation";
+import { UFC_WEIGHT_DIVISIONS, UPCOMING_UFC_EVENTS, UFC_CHAMPIONS } from "./ufc";
 
 export {
     APP_NAME,
@@ -20,4 +21,7 @@ export {
     PLANS,
     REVIEWS,
     FOOTER_LINKS,
+    UFC_WEIGHT_DIVISIONS,
+    UPCOMING_UFC_EVENTS,
+    UFC_CHAMPIONS,
 };

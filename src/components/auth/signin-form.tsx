@@ -1,24 +1,12 @@
+
 "use client";
 
-import React, { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form";
-import { SignUpSchema, SignUpSchemaType } from "@/schema";
-import Container from "../global/container";
 import Link from "next/link";
 import { ArrowLeftIcon, MailIcon } from "lucide-react";
 import Icons from "../global/icons";
@@ -26,7 +14,7 @@ import { FADE_IN_VARIANTS } from "@/constants";
 import { toast } from "sonner";
 import { useSignIn } from "@clerk/nextjs";
 import LoadingIcon from "../ui/loading-icon";
-import { OAuthStrategy } from "@clerk/types";
+import type { OAuthStrategy } from "@clerk/types";
 
 const SignInForm = () => {
 
@@ -87,42 +75,33 @@ const SignInForm = () => {
 
             await signIn.prepareFirstFactor({
                 strategy: "email_code",
-                emailAddressId: signIn.supportedFirstFactors!.find(
+                emailAddressId: signIn.supportedFirstFactors?.find(
                     (factor) => factor.strategy === "email_code"
-                )!.emailAddressId,
+                )?.emailAddressId || "",
             });
 
             setIsCodeSent(true);
 
-            // if (signInAttempt.status === "complete") {
-            //     await setActive({ session: signInAttempt.createdSessionId });
-            //     setIsCodeSent(true);
-            // } else {
-            //     console.error(JSON.stringify(signInAttempt, null, 2));
-            //     toast.error("Invalid email. Please try again.");
-            // }
-
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(JSON.stringify(error, null, 2));
-            switch (error.errors[0]?.code) {
-                case "form_identifier_not_found":
-                    toast.error("This email is not registered. Please sign up first.");
-                    router.push("/auth/signup?from=signin");
-                    break;
-                case "too_many_attempts":
-                    toast.error("Too many attempts. Please try again later.");
-                    break;
-                default:
-                    toast.error("An error occurred. Please try again");
-                    break;
+            if (error && typeof error === 'object' && 'errors' in error) {
+                const clerkError = error as { errors: Array<{ code: string }> };
+                switch (clerkError.errors[0]?.code) {
+                    case "form_identifier_not_found":
+                        toast.error("This email is not registered. Please sign up first.");
+                        router.push("/auth/signup?from=signin");
+                        break;
+                    case "too_many_attempts":
+                        toast.error("Too many attempts. Please try again later.");
+                        break;
+                    default:
+                        toast.error("An error occurred. Please try again");
+                        break;
+                }
             }
         } finally {
             setIsEmailLoading(false);
         }
-
-        // Check if the email is in db or not or if email is already have an account
-        // If email is already have an account, then show login form
-        // If email is not in db, then send a code to email address
     };
 
     const handleVerifyCode = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -138,7 +117,6 @@ const SignInForm = () => {
         setIsCodeLoading(true);
 
         try {
-
             const signInAttempt = await signIn.attemptFirstFactor({
                 strategy: "email_code",
                 code,
@@ -151,37 +129,35 @@ const SignInForm = () => {
                 console.error(JSON.stringify(signInAttempt, null, 2));
                 toast.error("Invalid code. Please try again.");
             }
-
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(JSON.stringify(error, null, 2));
-            switch (error.errors[0]?.code) {
-                case "form_code_incorrect":
-                    toast.error("Incorrect code. Please enter valid code.");
-                    break;
-                case "verification_failed":
-                    toast.error("Verification failed. Please try after some time.");
-                    break;
-                case "too_many_attempts":
-                    toast.error("Too many attempts. Please try again later.");
-                    break;
-                default:
-                    toast.error("An error occurred. Please try again");
-                    break;
+            if (error && typeof error === 'object' && 'errors' in error) {
+                const clerkError = error as { errors: Array<{ code: string }> };
+                switch (clerkError.errors[0]?.code) {
+                    case "form_code_incorrect":
+                        toast.error("Incorrect code. Please enter valid code.");
+                        break;
+                    case "verification_failed":
+                        toast.error("Verification failed. Please try after some time.");
+                        break;
+                    case "too_many_attempts":
+                        toast.error("Too many attempts. Please try again later.");
+                        break;
+                    default:
+                        toast.error("An error occurred. Please try again");
+                        break;
+                }
             }
         } finally {
             setIsCodeLoading(false);
         }
-
-        // Check if the code is correct or not
-        // If code is correct, then show create password form
-        // If code is incorrect, then show error message
     };
 
     useEffect(() => {
         if (from) {
             setIsEmailOpen(false);
         }
-    }, []);
+    }, [from]);
 
     return (
         <div className="flex flex-col text-center w-full">
@@ -192,7 +168,7 @@ const SignInForm = () => {
             >
                 <div className="flex justify-center">
                     <Link href="/">
-                        <Icons.icon className="w-8 h-8" />
+                        {typeof Icons.icon === 'function' && <Icons.icon className="w-8 h-8" />}
                     </Link>
                 </div>
                 <h1 className="text-2xl text-center mt-4">
@@ -230,7 +206,7 @@ const SignInForm = () => {
                                 {isGoogleLoading ? (
                                     <LoadingIcon size="sm" className="w-4 h-4 absolute left-4" />
                                 ) : (
-                                    <Icons.google className="w-4 h-4 absolute left-4" />
+                                    typeof Icons.google === 'function' && <Icons.google className="w-4 h-4 absolute left-4" />
                                 )}
                                 Continue with Google
                             </Button>
@@ -244,7 +220,9 @@ const SignInForm = () => {
                                 variant="tertiary"
                                 className="w-full"
                             >
-                                {isAppleLoading ? <LoadingIcon size="sm" className="w-4 h-4 absolute left-4" /> : <Icons.apple className="w-4 h-4 absolute left-4" />}
+                                {isAppleLoading ? <LoadingIcon size="sm" className="w-4 h-4 absolute left-4" /> : (
+                                    typeof Icons.apple === 'function' && <Icons.apple className="w-4 h-4 absolute left-4" />
+                                )}
                                 Continue with Apple
                             </Button>
                         </div>
@@ -305,7 +283,7 @@ const SignInForm = () => {
                                         className="w-full"
                                     >
                                         <Link href="https://mail.google.com" target="_blank">
-                                            <Icons.gmail className="w-4 h-4 mr-2" />
+                                            {typeof Icons.gmail === 'function' && <Icons.gmail className="w-4 h-4 mr-2" />}
                                             Gmail
                                         </Link>
                                     </Button>
@@ -317,7 +295,7 @@ const SignInForm = () => {
                                         className="w-full"
                                     >
                                         <Link href="https://outlook.live.com" target="_blank">
-                                            <Icons.outlook className="w-4 h-4 mr-2" />
+                                            {typeof Icons.outlook === 'function' && <Icons.outlook className="w-4 h-4 mr-2" />}
                                             Outlook
                                         </Link>
                                     </Button>

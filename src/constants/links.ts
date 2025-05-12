@@ -1,4 +1,6 @@
-import { ClockIcon, MessageSquare, BarChart2, FileTextIcon, UserPlusIcon, CreditCardIcon, SettingsIcon, LogOut, Headphones, ChartPieIcon, LucideIcon, MessagesSquareIcon, NewspaperIcon, MegaphoneIcon, LineChartIcon, MessageSquareTextIcon, UsersIcon } from 'lucide-react';
+
+import { ClockIcon, MessageSquare, CreditCardIcon, SettingsIcon, ChartPieIcon, NewspaperIcon, LineChartIcon, Award, Dumbbell, Swords, TrendingUp, Trophy } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 type Link = {
     href: string;
@@ -13,24 +15,49 @@ export const SIDEBAR_LINKS: Link[] = [
         icon: ChartPieIcon,
     },
     {
-        href: "/dashboard/campaigns",
-        label: "Campaigns",
-        icon: MegaphoneIcon
+        href: "/dashboard/fighters",
+        label: "Fighters",
+        icon: Dumbbell
+    },
+    {
+        href: "/dashboard/events",
+        label: "Events",
+        icon: ClockIcon
+    },
+    {
+        href: "/dashboard/predictions",
+        label: "Predictions",
+        icon: TrendingUp
+    },
+    {
+        href: "/dashboard/rankings",
+        label: "Rankings",
+        icon: Trophy
+    },
+    {
+        href: "/dashboard/compare",
+        label: "Compare Fighters",
+        icon: Swords
+    },
+    {
+        href: "/dashboard/news",
+        label: "News",
+        icon: NewspaperIcon
+    },
+    {
+        href: "/dashboard/pound-for-pound",
+        label: "Pound for Pound",
+        icon: Award
     },
     {
         href: "/dashboard/analytics",
-        label: "Analytics",
+        label: "Fight Analytics",
         icon: LineChartIcon
     },
     {
-        href: "/dashboard/posts",
-        label: "Posts",
-        icon: MessageSquareTextIcon
-    },
-    {
-        href: "/dashboard/engagement",
-        label: "Engagement",
-        icon: UsersIcon
+        href: "/dashboard/comments",
+        label: "Community",
+        icon: MessageSquare
     },
     {
         href: "/dashboard/billing",
@@ -41,45 +68,46 @@ export const SIDEBAR_LINKS: Link[] = [
         href: "/dashboard/settings",
         label: "Settings",
         icon: SettingsIcon
-    },
+    }
 ];
 
 export const FOOTER_LINKS = [
     {
-        title: "Product",
+        title: "UFC Predict",
         links: [
             { name: "Home", href: "/" },
             { name: "Features", href: "/" },
             { name: "Pricing", href: "/" },
             { name: "Contact", href: "/" },
-            { name: "Download", href: "/" },
+            { name: "About Us", href: "/about" },
+        ],
+    },
+    {
+        title: "UFC Content",
+        links: [
+            { name: "Fighters", href: "/fighters" },
+            { name: "Events", href: "/events" },
+            { name: "Rankings", href: "/rankings" },
+            { name: "News", href: "/news" },
+            { name: "Predictions", href: "/predictions" },
         ],
     },
     {
         title: "Resources",
         links: [
-            { name: "Blog", href: "/blog" },
-            { name: "Help Center", href: "/help-center" },
+            { name: "Fight Analysis", href: "/analysis" },
+            { name: "Statistics", href: "/statistics" },
             { name: "Community", href: "/community" },
-            { name: "Guides", href: "/guides" },
+            { name: "FAQ", href: "/faq" },
         ],
     },
     {
         title: "Legal",
         links: [
-            { name: "Privacy", href: "/privacy" },
-            { name: "Terms", href: "/terms" },
-            { name: "Cookies", href: "/cookies" },
-        ],
-    },
-    {
-        title: "Developers",
-        links: [
-            { name: "API Docs", href: "/api-docs" },
-            { name: "SDKs", href: "/sdks" },
-            { name: "Tools", href: "/tools" },
-            { name: "Open Source", href: "/open-source" },
-            { name: "Changelog", href: "/changelog" },
+            { name: "Privacy Policy", href: "/privacy" },
+            { name: "Terms of Service", href: "/terms" },
+            { name: "Cookies Policy", href: "/cookies" },
+            { name: "Disclaimer", href: "/disclaimer" },
         ],
     },
 ];

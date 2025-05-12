@@ -1,32 +1,19 @@
 "use client";
 
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { motion } from "framer-motion";
 import { useSignIn, useSignUp } from "@clerk/nextjs";
 
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form";
-import { SignUpSchema, SignUpSchemaType } from "@/schema";
-import Container from "../global/container";
 import Link from "next/link";
 import { ArrowLeftIcon, MailIcon } from "lucide-react";
 import Icons from "../global/icons";
 import { FADE_IN_VARIANTS } from "@/constants";
 import { toast } from "sonner";
 import LoadingIcon from "../ui/loading-icon";
-import { OAuthStrategy } from "@clerk/types";
+import type { OAuthStrategy } from "@clerk/types";
+import type { motion } from "framer-motion";
 
 
 const SignUpForm = () => {
@@ -96,8 +83,10 @@ const SignUpForm = () => {
             setIsCodeSent(true);
 
             toast.success("We have sent a code to your email address");
-        } catch (error: any) {
-            switch (error.errors[0]?.code) {
+        } catch (error: unknown) {
+            const clerkError = error as { errors?: Array<{ code?: string }> };
+            
+            switch (clerkError.errors?.[0]?.code) {
                 case "form_identifier_exists":
                     toast.error("This email is already registered. Please sign in.");
                     router.push("/auth/signin?from=signup");
@@ -118,10 +107,6 @@ const SignUpForm = () => {
         } finally {
             setIsEmailLoading(false);
         }
-
-        // Check if the email is in db or not or if email is already have an account
-        // If email is already have an account, then show login form
-        // If email is not in db, then send a code to email address
     };
 
     const handleVerifyCode = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -154,29 +139,26 @@ const SignUpForm = () => {
         } finally {
             setIsCodeLoading(false);
         }
-
-        // Check if the code is correct or not
-        // If code is correct, then show create password form
-        // If code is incorrect, then show error message
     };
 
     useEffect(() => {
         if (from) {
             setIsEmailOpen(false);
         }
-    }, []);
+    }, [from]);
 
 
     return (
         <div className="flex flex-col text-center w-full">
-            <motion.div
-                variants={FADE_IN_VARIANTS}
-                animate="visible"
-                initial="hidden"
+            <div
+                className="motion-div"
+                data-variants={FADE_IN_VARIANTS}
+                data-animate="visible"
+                data-initial="hidden"
             >
                 <div className="flex justify-center">
                     <Link href="/">
-                        <Icons.icon className="w-8 h-8" />
+                        {Icons.icon && Icons.icon({ className: "w-8 h-8" })}
                     </Link>
                 </div>
                 <h1 className="text-2xl text-center mt-4">
@@ -192,14 +174,14 @@ const SignUpForm = () => {
                             ? "Please check your inbox for verification code"
                             : "Enter your email address to get started"}
                 </p>
-            </motion.div>
+            </div>
             {isEmailOpen ? (
                 <div>
-                    <motion.div
-                        variants={FADE_IN_VARIANTS}
-                        animate="visible"
-                        initial="hidden"
-                        className="flex flex-col gap-4 py-8"
+                    <div
+                        className="motion-div flex flex-col gap-4 py-8"
+                        data-variants={FADE_IN_VARIANTS}
+                        data-animate="visible"
+                        data-initial="hidden"
                     >
                         <div className="w-full">
                             <Button
@@ -210,7 +192,9 @@ const SignUpForm = () => {
                                 onClick={() => handleOAuth("oauth_google")}
                                 className="w-full"
                             >
-                                {isGoogleLoading ? <LoadingIcon size="sm" className="w-4 h-4 absolute left-4" /> : <Icons.google className="w-4 h-4 absolute left-4" />}
+                                {isGoogleLoading ? 
+                                  <LoadingIcon size="sm" className="w-4 h-4 absolute left-4" /> : 
+                                  Icons.google && Icons.google({ className: "w-4 h-4 absolute left-4" })}
                                 Continue with Google
                             </Button>
                         </div>
@@ -223,7 +207,9 @@ const SignUpForm = () => {
                                 onClick={() => handleOAuth("oauth_apple")}
                                 className="w-full"
                             >
-                                {isAppleLoading ? <LoadingIcon size="sm" className="w-4 h-4 absolute left-4" /> : <Icons.apple className="w-4 h-4 absolute left-4" />}
+                                {isAppleLoading ? 
+                                  <LoadingIcon size="sm" className="w-4 h-4 absolute left-4" /> : 
+                                  Icons.apple && Icons.apple({ className: "w-4 h-4 absolute left-4" })}
                                 Continue with Apple
                             </Button>
                         </div>
@@ -243,18 +229,18 @@ const SignUpForm = () => {
                         <div className="pt-12 text-muted-foreground text-sm">
                             <span>Already have an account?</span> <Link href="/auth/signin" className="text-foreground">Login</Link>
                         </div>
-                    </motion.div>
+                    </div>
                 </div>
             ) : (
                 <div>
                     {isCodeSent ? (
                         <div>
-                            <motion.form
-                                variants={FADE_IN_VARIANTS}
-                                animate="visible"
-                                initial="hidden"
+                            <form
+                                className="motion-form py-8 w-full flex flex-col gap-4"
+                                data-variants={FADE_IN_VARIANTS}
+                                data-animate="visible"
+                                data-initial="hidden"
                                 onSubmit={handleVerifyCode}
-                                className="py-8 w-full flex flex-col gap-4"
                             >
                                 <div className="w-full">
                                     <Input
@@ -301,16 +287,16 @@ const SignUpForm = () => {
                                         </Link>
                                     </Button>
                                 </div>
-                            </motion.form>
+                            </form>
                         </div>
                     ) : (
                         <div>
-                            <motion.form
-                                variants={FADE_IN_VARIANTS}
-                                animate="visible"
-                                initial="hidden"
+                            <form
+                                className="motion-form py-8 w-full flex flex-col gap-4"
+                                data-variants={FADE_IN_VARIANTS}
+                                data-animate="visible"
+                                data-initial="hidden"
                                 onSubmit={handleEmail}
-                                className="py-8 w-full flex flex-col gap-4"
                             >
                                 <div className="w-full">
                                     <Input
@@ -345,7 +331,7 @@ const SignUpForm = () => {
                                         Back
                                     </Button>
                                 </div>
-                            </motion.form>
+                            </form>
                         </div>
                     )}
                 </div>

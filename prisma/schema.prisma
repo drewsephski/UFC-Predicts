@@ -16,7 +16,24 @@ datasource db {
 
 enum Role {
   user
-  assistant
+  admin
+  analyst
+}
+
+enum PredictionOutcome {
+  win
+  loss
+  draw
+  no_contest
+}
+
+enum FightMethod {
+  decision
+  knockout
+  technical_knockout
+  submission
+  disqualification
+  no_contest
 }
 
 model User {
@@ -25,7 +42,195 @@ model User {
   email        String  @unique
   name         String?
   avatar       String?
+  role         Role    @default(user)
+  bio          String?
+  location     String?
+  twitter      String?
+  instagram    String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // Relations
+  predictions  Prediction[]
+  favorites    Favorite[]
+  comments     Comment[]
+  fightPicks   FightPick[]
+  articles     Article[]
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Fighter {
+  id           String  @id @default(cuid()) @map("_id")
+  name         String
+  nickname     String?
+  division     String
+  record       String
+  country      String?
+  age          Int?
+  height       String?
+  weight       String?
+  reach        String?
+  stance       String?
+  isChampion   Boolean @default(false)
+  imageUrl     String?
+  wins         Int     @default(0)
+  losses       Int     @default(0)
+  draws        Int     @default(0)
+  knockouts    Int     @default(0)
+  submissions  Int     @default(0)
+  ufc_id       String? @unique
+  ranking      Int?
+
+  // Stats
+  strikingAccuracy Float?
+  takedownAccuracy Float?
+  strikesLandedPerMin Float?
+  strikesAbsorbedPerMin Float?
+  avgTakedownsPer15Min Float?
+  avgSubmissionsPer15Min Float?
+  defenseStats   Json?
+
+  // Relations
+  predictions    Prediction[]
+  favorites      Favorite[]
+  fightsAsRedCorner Fight[] @relation("RedCornerFighter")
+  fightsAsBlueCorner Fight[] @relation("BlueCornerFighter")
+  fightPicks     FightPick[]
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Event {
+  id             String  @id @default(cuid()) @map("_id")
+  name           String
+  date           DateTime
+  location       String?
+  venue          String?
+  isMainEvent    Boolean @default(false)
+  imageUrl       String?
+  ufc_id         String? @unique
+
+  // Relations
+  fights         Fight[]
+  articles       Article[]
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Fight {
+  id             String  @id @default(cuid()) @map("_id")
+  eventId        String
+  redCornerId    String
+  blueCornerId   String
+  weightClass    String
+  rounds         Int     @default(3)
+  isMainEvent    Boolean @default(false)
+  isTitleFight   Boolean @default(false)
+  status         String  @default("scheduled") // scheduled, completed, cancelled
+  result         String?
+  winMethod      FightMethod?
+  winRound       Int?
+  winTime        String?
+  ufc_id         String? @unique
+
+  // Relations
+  event          Event   @relation(fields: [eventId], references: [id])
+  redCorner      Fighter @relation("RedCornerFighter", fields: [redCornerId], references: [id])
+  blueCorner     Fighter @relation("BlueCornerFighter", fields: [blueCornerId], references: [id])
+  fightPicks     FightPick[]
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Prediction {
+  id           String  @id @default(cuid()) @map("_id")
+  fighterId    String
+  userId       String
+  prediction   String
+  confidence   Float
+  notes        String?
+  outcome      PredictionOutcome?
+
+  // Relations
+  fighter      Fighter @relation(fields: [fighterId], references: [id])
+  user         User    @relation(fields: [userId], references: [id])
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model FightPick {
+  id           String  @id @default(cuid()) @map("_id")
+  fightId      String
+  userId       String
+  fighterId    String  // The fighter picked to win
+  method       FightMethod?
+  round        Int?
+  confidence   Float?
+  notes        String?
+  isCorrect    Boolean?
+
+  // Relations
+  fight        Fight   @relation(fields: [fightId], references: [id])
+  user         User    @relation(fields: [userId], references: [id])
+  fighter      Fighter @relation(fields: [fighterId], references: [id])
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([fightId, userId])
+}
+
+model Favorite {
+  id           String  @id @default(cuid()) @map("_id")
+  fighterId    String
+  userId       String
+
+  // Relations
+  fighter      Fighter @relation(fields: [fighterId], references: [id])
+  user         User    @relation(fields: [userId], references: [id])
+
+  createdAt    DateTime @default(now())
+
+  @@unique([fighterId, userId])
+}
+
+model Article {
+  id           String  @id @default(cuid()) @map("_id")
+  title        String
+  slug         String  @unique
+  content      String
+  excerpt      String?
+  imageUrl     String?
+  published    Boolean @default(false)
+  authorId     String
+  eventId      String?
+
+  // Relations
+  author       User    @relation(fields: [authorId], references: [id])
+  event        Event?  @relation(fields: [eventId], references: [id])
+  comments     Comment[]
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Comment {
+  id           String  @id @default(cuid()) @map("_id")
+  content      String
+  authorId     String
+  articleId    String
+  parentId     String?
+
+  // Relations
+  author       User    @relation(fields: [authorId], references: [id])
+  article      Article @relation(fields: [articleId], references: [id])
+  parent       Comment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies      Comment[] @relation("CommentReplies")
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
