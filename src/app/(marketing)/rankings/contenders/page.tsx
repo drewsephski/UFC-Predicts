@@ -144,19 +144,41 @@ export default function ContendersRankingsPage() {
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-          {MOCK_CONTENDERS.map((fighter) => {
-            const recordParts = fighter.record.split('-');
+          {MOCK_CONTENDERS.map((contenderFighter) => {
+            const recordParts = contenderFighter.record.split('-');
+            const nameParts = contenderFighter.name.split(' ');
+            const firstName = nameParts[0] || null;
+            const lastName = nameParts.slice(1).join(' ') || null;
+
+            const fighterDataForCard: import('@/types/mma').Fighter = {
+              FighterId: Number.parseInt(contenderFighter.id.replace(/\D/g, ''), 10) || Date.now() + Math.random(), // Ensure a number, fallback for non-numeric IDs
+              FirstName: firstName,
+              LastName: lastName,
+              Nickname: contenderFighter.nickname || null,
+              WeightClass: contenderFighter.division,
+              Wins: Number.parseInt(recordParts[0] || '0', 10),
+              Losses: Number.parseInt(recordParts[1] || '0', 10),
+              Draws: Number.parseInt(recordParts[2] || '0', 10),
+              TechnicalKnockouts: contenderFighter.winsByKO,
+              Submissions: contenderFighter.winsBySub,
+              // --- Fill in other required/optional fields from src/types/mma.ts#Fighter ---
+              BirthDate: null, 
+              Height: null,
+              Weight: null,
+              Reach: null,
+              NoContests: 0, // Default if not available
+              TechnicalKnockoutLosses: null,
+              SubmissionLosses: null,
+              TitleWins: contenderFighter.isChampion ? 1 : 0,
+              TitleLosses: null,
+              TitleDraws: null,
+              CareerStats: null, // Assuming CareerStats is complex and not in MOCK_CONTENDERS
+            };
+
             return (
               <FighterCard
-                fighter={{
-                  ...fighter,
-                  wins: Number.parseInt(recordParts[0] || '0', 10),
-                  losses: Number.parseInt(recordParts[1] || '0', 10),
-                  draws: Number.parseInt(recordParts[2] || '0', 10),
-                  knockouts: fighter.winsByKO,
-                  submissions: fighter.winsBySub
-                }}
-                key={fighter.id}
+                fighter={fighterDataForCard}
+                key={contenderFighter.id}
               />
             );
           })}
