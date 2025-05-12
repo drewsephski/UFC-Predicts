@@ -137,6 +137,9 @@ const DIVISION_RANKINGS = {
   }
 };
 
+// Define a type for the keys of DIVISION_RANKINGS
+type DivisionId = keyof typeof DIVISION_RANKINGS;
+
 export default function DivisionsRankingsPage() {
   return (
     <div className="relative w-full min-h-screen bg-gradient-to-b from-black to-red-950/30">
@@ -179,7 +182,9 @@ export default function DivisionsRankingsPage() {
             </TabsList>
           </div>
           
-          {Object.keys(DIVISION_RANKINGS).map((divisionId) => (
+          {Object.keys(DIVISION_RANKINGS).map((key) => {
+            const divisionId = key as DivisionId; // Assert the type of divisionId
+            return (
             <TabsContent key={divisionId} value={divisionId} className="mt-0">
               <div className="bg-black/30 border border-red-500/20 rounded-lg p-6 mb-8">
                 <RankingsTable 
@@ -216,7 +221,8 @@ export default function DivisionsRankingsPage() {
                 )}
               </div>
             </TabsContent>
-          ))}
+            );
+          })}
           
           {/* For divisions without mock data, show a placeholder */}
           {UFC_WEIGHT_DIVISIONS.filter(div => !Object.keys(DIVISION_RANKINGS).includes(div.id)).map((division) => (
