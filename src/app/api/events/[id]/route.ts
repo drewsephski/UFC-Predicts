@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/prisma";
+import type { Fight, Event } from '@/contexts/ufc-context';
 
 export async function GET(
   req: NextRequest,
@@ -7,40 +8,49 @@ export async function GET(
 ) {
   try {
     const id = params.id;
-    
+
     const event = await db.event.findUnique({
       where: { id },
       include: {
-        venue: true,
-        mainCard: {
+        fights: {
           include: {
-            fighter1: true,
-            fighter2: true
+            redCorner: true,
+            blueCorner: true
           },
           orderBy: {
-            order: 'asc'
-          }
-        },
-        prelimCard: {
-          include: {
-            fighter1: true,
-            fighter2: true
-          },
-          orderBy: {
-            order: 'asc'
+            isMainEvent: 'desc'
           }
         }
       }
     });
-    
+
     if (!event) {
       return NextResponse.json(
         { error: "Event not found" },
         { status: 404 }
       );
     }
-    
-    return NextResponse.json(event);
+
+    // Transform the data to match the expected format in the frontend
+    const mainCard = event.fights.filter(fight => fight.isMainEvent || fight.isTitleFight).map(fight => ({
+      ...fight,
+      fighter1: fight.redCorner,
+      fighter2: fight.blueCorner
+    }));
+
+    const prelimCard = event.fights.filter(fight => !fight.isMainEvent && !fight.isTitleFight).map(fight => ({
+      ...fight,
+      fighter1: fight.redCorner,
+      fighter2: fight.blueCorner
+    }));
+
+    const formattedEvent = {
+      ...event,
+      mainCard,
+      prelimCard
+    };
+
+    return NextResponse.json(formattedEvent);
   } catch (error) {
     console.error("Error fetching event:", error);
     return NextResponse.json(

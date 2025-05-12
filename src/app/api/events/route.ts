@@ -6,9 +6,9 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const upcoming = searchParams.get("upcoming") === "true";
     const past = searchParams.get("past") === "true";
-    
+
     let whereClause = {};
-    
+
     if (upcoming) {
       whereClause = {
         date: {
@@ -22,30 +22,44 @@ export async function GET(req: NextRequest) {
         }
       };
     }
-    
+
     const events = await db.event.findMany({
       where: whereClause,
       orderBy: {
         date: upcoming ? 'asc' : 'desc'
       },
       include: {
-        venue: true,
-        mainCard: {
+        fights: {
           include: {
-            fighter1: true,
-            fighter2: true
-          }
-        },
-        prelimCard: {
-          include: {
-            fighter1: true,
-            fighter2: true
+            redCorner: true,
+            blueCorner: true
           }
         }
       }
     });
-    
-    return NextResponse.json(events);
+
+    // Transform the data to match the expected format in the frontend
+    const formattedEvents = events.map(event => {
+      const mainCard = event.fights.filter(fight => fight.isMainEvent || fight.isTitleFight).map(fight => ({
+        ...fight,
+        fighter1: fight.redCorner,
+        fighter2: fight.blueCorner
+      }));
+
+      const prelimCard = event.fights.filter(fight => !fight.isMainEvent && !fight.isTitleFight).map(fight => ({
+        ...fight,
+        fighter1: fight.redCorner,
+        fighter2: fight.blueCorner
+      }));
+
+      return {
+        ...event,
+        mainCard,
+        prelimCard
+      };
+    });
+
+    return NextResponse.json(formattedEvents);
   } catch (error) {
     console.error("Error fetching events:", error);
     return NextResponse.json(
