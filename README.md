@@ -86,3 +86,92 @@ If you have any questions or feedback, feel free to reach out via [GitHub Issues
 ---
 
 Built with ❤️ by [Shreyas](https://shreyas-sihasane.vercel.app/)
+
+<div align="center">
+  <img src="public/images/ufc/ufc-logo.svg" alt="UFC Predicts Logo" width="100" height="100"> 
+  <h1>UFC Predicts</h1>
+</div>
+
+UFC Predicts is an application designed to provide predictions and statistics for UFC (Ultimate Fighting Championship) fights and fighters. Leveraging data analysis, it aims to offer insights into potential fight outcomes, fighter performance metrics, and overall UFC event tracking.
+
+## 🌟 Features
+
+- **Fighter Profiles:** Detailed statistics and information for UFC fighters.
+- **Event Tracking:** Information on upcoming and past UFC events.
+- **Fight Predictions:** Data-driven predictions for fight outcomes.
+- **Matchup Analysis:** Compare fighters head-to-head.
+- **User Accounts:** Sign up to save favorite fighters and track your prediction accuracy.
+- **Modern UI:** Built with a sleek red and black theme using Tailwind CSS and Shadcn UI.
+
+## 💻 Tech Stack
+
+- **Framework:** Next.js (App Router)
+- **Styling:** Tailwind CSS, Shadcn UI, Magic UI
+- **Database:** Prisma (with a database like PostgreSQL or MySQL - specify if known)
+- **Authentication:** Clerk
+- **Data Fetching/State Management:** React Hooks, SWR/React Query (specify if used)
+- **Language:** TypeScript
+
+## 🛠️ Getting Started
+
+To run UFC Predicts locally, follow these steps:
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/drewsephski/UFC-Predicts.git
+    cd UFC-Predicts
+    ```
+2.  **Install dependencies:**
+    ```bash
+    npm install 
+    # or pnpm install or yarn install
+    ```
+3.  **Set up environment variables:**
+    Create a `.env` file in the root of the project and add the necessary environment variables. Refer to `.env.example` if available, or ensure you have:
+    ```env
+    # Clerk Authentication
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+    CLERK_SECRET_KEY=
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL=/auth/signin
+    NEXT_PUBLIC_CLERK_SIGN_UP_URL=/auth/signup
+    NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/app
+    NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/app
+
+    # Prisma Database (Example for PostgreSQL)
+    DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
+
+    # SportsDataIO API Key (if used for fetching data)
+    # SPORTSDATA_IO_API_KEY=
+
+    # NextAuth.js (if used - though Clerk is listed above)
+    # NEXTAUTH_URL=
+    # NEXTAUTH_SECRET=
+    ```
+4.  **Initialize Prisma (if new setup or schema changes):**
+    ```bash
+    npx prisma generate
+    npx prisma db push # Or prisma migrate dev for development migrations
+    ```
+5.  **Run the development server:**
+    ```bash
+    npm run dev
+    ```
+    Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## 🚀 Deployment
+
+This application is configured for deployment on a Node.js hosting environment (e.g., Vercel, Netlify, AWS Amplify, DigitalOcean App Platform) due to the use of Next.js features like Middleware and API Routes that require a server.
+
+If attempting a static export for platforms like GitHub Pages, middleware would need to be disabled, and `next.config.mjs` would require `output: 'export'` and other relevant static export configurations.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request or open an Issue.
+
+## 📜 License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+Built by [drewsephski](https://github.com/drewsephski)
