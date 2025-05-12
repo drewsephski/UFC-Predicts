@@ -1,4 +1,3 @@
-
 "use client"
 
 import React from 'react'
@@ -201,7 +200,7 @@ export default function Page() {
     )
 }
 
-// Define the Fighter type
+// Define the Fighter type (no longer exported)
 interface Fighter {
   id: string;
   name: string;
@@ -220,8 +219,8 @@ interface Fighter {
   updatedAt: string;
 }
 
-// Export the fetchFighters function
-export async function fetchFighters(): Promise<Fighter[]> {
+// fetchFighters function (no longer exported)
+async function fetchFighters(): Promise<Fighter[]> {
   try {
     const response = await fetch('https://api.sportsdata.io/v3/mma/stats/json/Fighters?key=7fe7fb099e6a482e8c83febaa699e36d', {
       // cache: 'no-store', // If you want fresh data on every request during development
