@@ -86,7 +86,7 @@ export default function PastEventsPage() {
               {/* UFC 300 */}
               <div className="bg-black/30 border border-red-500/20 rounded-lg overflow-hidden group">
                 <div className="relative h-48">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10" />
                   <Image 
                     src="/images/events/ufc-300.jpg" 
                     alt="UFC 300" 
@@ -131,7 +131,7 @@ export default function PastEventsPage() {
               {/* UFC 299 */}
               <div className="bg-black/30 border border-red-500/20 rounded-lg overflow-hidden group">
                 <div className="relative h-48">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10" />
                   <Image 
                     src="/images/events/ufc-299.jpg" 
                     alt="UFC 299" 
@@ -153,7 +153,7 @@ export default function PastEventsPage() {
                   <div className="mb-4">
                     <div className="flex justify-between items-center mb-2">
                       <div className="flex items-center">
-                        <span className="text-white font-medium">Sean O'Malley</span>
+                        <span className="text-white font-medium">Sean O&apos;Malley</span>
                         <Badge className="ml-2 bg-green-600 text-white border-none">W</Badge>
                       </div>
                       <span className="text-white">Decision</span>
@@ -176,7 +176,7 @@ export default function PastEventsPage() {
               {/* UFC 298 */}
               <div className="bg-black/30 border border-red-500/20 rounded-lg overflow-hidden group">
                 <div className="relative h-48">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10" />
                   <Image 
                     src="/images/events/ufc-298.jpg" 
                     alt="UFC 298" 
@@ -221,7 +221,7 @@ export default function PastEventsPage() {
               {/* UFC Fight Night: Hermansson vs. Pyfer */}
               <div className="bg-black/30 border border-red-500/20 rounded-lg overflow-hidden group">
                 <div className="relative h-48">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10" />
                   <Image 
                     src="/images/events/ufc-fight-night-hermansson-pyfer.jpg" 
                     alt="UFC Fight Night: Hermansson vs. Pyfer" 

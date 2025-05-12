@@ -73,12 +73,12 @@ const Features = () => {
                                     <div className="bento-card w-full relative items-center justify-center">
                                         <div className="w-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                                             <p className="text-base text-muted-foreground text-justify [mask-image:radial-gradient(50%_50%_at_50%_50%,#BAB3FF_0%,rgba(186,179,255,0)_90.69%)]">
-                                                Our UFC fight prediction platform uses advanced statistical analysis to provide accurate predictions for upcoming fights. We analyze fighter statistics, historical performance, matchup styles, and many other factors to give you the edge in understanding how fights might unfold. Whether you're a casual fan or a serious analyst, our platform offers valuable insights into fighter strengths, weaknesses, and potential outcomes. Stay ahead of the curve with our comprehensive UFC analytics and prediction tools. Make more informed decisions about the fights you watch and enjoy a deeper understanding of the sport's technical aspects.
+                                                Our UFC fight prediction platform uses advanced statistical analysis to provide accurate predictions for upcoming fights. We analyze fighter statistics, historical performance, matchup styles, and many other factors to give you the edge in understanding how fights might unfold. Whether you&apos;re a casual fan or a serious analyst, our platform offers valuable insights into fighter strengths, weaknesses, and potential outcomes. Stay ahead of the curve with our comprehensive UFC analytics and prediction tools. Make more informed decisions about the fights you watch and enjoy a deeper understanding of the sport&apos;s technical aspects.
                                             </p>
                                         </div>
                                         <div className="w-full h-16 relative">
                                             <Images.centeral className="w-full h-full" />
-                                            <div className="w-20 h-20 rounded-full bg-primary/10 blur-2xl z-10 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+                                            <div className="w-20 h-20 rounded-full bg-primary/10 blur-2xl z-10 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
                                         </div>
                                     </div>
                                 </MagicCard>
@@ -90,7 +90,7 @@ const Features = () => {
                                             <Icons.icon className="w-24 h-24 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-80" />
                                             <Images.circlePallete className="w-full h-full opacity-30" />
                                         </div>
-                                        <div className="w-28 h-28 rounded-full bg-primary/10 blur-3xl -z-10 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+                                        <div className="w-28 h-28 rounded-full bg-primary/10 blur-3xl -z-10 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
                                     </div>
                                 </MagicCard>
                             </div>
@@ -106,7 +106,7 @@ const Features = () => {
                                     </div>
                                     <div className="w-full h-28 relative">
                                         <Images.integration className="w-full h-full" />
-                                        <div className="w-28 h-28 rounded-full bg-primary/10 blur-3xl -z-10 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full"></div>
+                                        <div className="w-28 h-28 rounded-full bg-primary/10 blur-3xl -z-10 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full" />
                                     </div>
                                 </div>
                             </MagicCard>

@@ -1,6 +1,7 @@
 import { db } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs";
-import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 /**
  * GET /api/fights

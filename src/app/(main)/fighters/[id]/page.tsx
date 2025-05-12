@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { useUFC, Fighter, Fight } from '@/contexts/ufc-context';
+import { useUFC, type Fighter, type Fight } from '@/contexts/ufc-context';
 import { LoadingState, ErrorState } from '@/components/ui/loading-state';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,7 +20,7 @@ import { PaginationNav } from '@/components/ui/pagination-nav';
 
 const FighterDetailPage = () => {
   const params = useParams();
-  const fighterId = params.id as string;
+  const fighterId = params.id;
 
   const {
     fighters,
@@ -59,11 +59,11 @@ const FighterDetailPage = () => {
         const currentIndex = divisionFighters.findIndex(f => f.id === fighterId);
 
         if (currentIndex > 0) {
-          setPrevFighter(divisionFighters[currentIndex - 1]);
+          setPrevFighter(divisionFighters[currentIndex - 1] || null);
         }
 
         if (currentIndex < divisionFighters.length - 1) {
-          setNextFighter(divisionFighters[currentIndex + 1]);
+          setNextFighter(divisionFighters[currentIndex + 1] || null);
         }
       } else {
         setError('Fighter not found');

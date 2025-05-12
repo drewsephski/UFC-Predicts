@@ -85,10 +85,10 @@ const FightGrid = ({
     "Middleweight",
     "Light Heavyweight",
     "Heavyweight",
-    "Women's Strawweight",
-    "Women's Flyweight",
-    "Women's Bantamweight",
-    "Women's Featherweight",
+    "Women&apos;s Strawweight",
+    "Women&apos;s Flyweight",
+    "Women&apos;s Bantamweight",
+    "Women&apos;s Featherweight",
   ];
   
   if (isLoading) {

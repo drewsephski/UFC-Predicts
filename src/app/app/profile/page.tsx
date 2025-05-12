@@ -148,20 +148,42 @@ export default function ProfilePage() {
             </Card>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-              {profile.favorites.map((favorite) => (
-                <FighterCard
-                  key={favorite.id}
-                  id={favorite.fighter.id}
-                  name={favorite.fighter.name}
-                  nickname={favorite.fighter.nickname}
-                  division={favorite.fighter.division}
-                  record={favorite.fighter.record}
-                  country={favorite.fighter.country}
-                  isChampion={favorite.fighter.isChampion}
-                  imageUrl={favorite.fighter.imageUrl}
-                  favoriteId={favorite.id}
-                />
-              ))}
+              {profile.favorites.map((favorite) => {
+                const recordString = favorite.fighter.record || "0-0-0";
+                const recordParts = recordString.split('-').map(part => Number.parseInt(part, 10) || 0);
+                const firstName = favorite.fighter.name.split(' ')[0] || null;
+                const lastName = favorite.fighter.name.split(' ').slice(1).join(' ') || "";
+
+                return (
+                  <FighterCard
+                    key={favorite.id}
+                    fighter={{
+                      FighterId: Number(favorite.fighter.id),
+                      FirstName: firstName,
+                      LastName: lastName,
+                      Nickname: favorite.fighter.nickname || null,
+                      WeightClass: favorite.fighter.division || null,
+                      Wins: recordParts[0],
+                      Losses: recordParts[1],
+                      Draws: recordParts[2],
+                      BirthDate: favorite.fighter.country || null,
+                      TitleWins: favorite.fighter.isChampion ? 1 : 0,
+                      CareerStats: null,
+                      Height: null,
+                      Weight: null,
+                      Reach: null,
+                      NoContests: null,
+                      TechnicalKnockouts: null,
+                      TechnicalKnockoutLosses: null,
+                      Submissions: null,
+                      SubmissionLosses: null,
+                      TitleLosses: null,
+                      TitleDraws: null
+                    }}
+                    favoriteId={favorite.id}
+                  />
+                );
+              })}
             </div>
           )}
         </TabsContent>

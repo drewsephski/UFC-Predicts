@@ -1,6 +1,6 @@
-import React from 'react';
+
+import type React from "react";
 import Image from 'next/image';
-import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dumbbell, Target, Shield, Swords } from 'lucide-react';
@@ -96,7 +96,7 @@ export const FighterComparison: React.FC<FighterComparisonProps> = ({ fighters }
               {fighter1.name}
             </h3>
             {fighter1.nickname && (
-              <p className="text-red-400 text-sm">"{fighter1.nickname}"</p>
+              <p className="text-red-400 text-sm">&quot;{fighter1.nickname}&quot;</p>
             )}
             <p className="text-gray-400 text-sm">{fighter1.record}</p>
             <p className="text-gray-400 text-xs mt-1">{fighter1.country}</p>
@@ -120,7 +120,7 @@ export const FighterComparison: React.FC<FighterComparisonProps> = ({ fighters }
               {fighter2.name}
             </h3>
             {fighter2.nickname && (
-              <p className="text-red-400 text-sm">"{fighter2.nickname}"</p>
+              <p className="text-red-400 text-sm">&quot;{fighter2.nickname}&quot;</p>
             )}
             <p className="text-gray-400 text-sm">{fighter2.record}</p>
             <p className="text-gray-400 text-xs mt-1">{fighter2.country}</p>

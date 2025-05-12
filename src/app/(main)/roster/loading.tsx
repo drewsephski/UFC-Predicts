@@ -10,7 +10,7 @@ export default function LoadingRoster() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mt-8">
         {[...Array(10)].map((_, i) => (
-          <div key={`loading-fighter-${i}`} className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 border border-gray-200 dark:border-gray-700 animate-pulse">
+          <div key={`loading-fighter-skeleton-${i}-${Math.random().toString(36).substr(2, 9)}`} className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 border border-gray-200 dark:border-gray-700 animate-pulse">
             <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded mb-3 w-3/4" />
             <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded mb-2 w-1/2" />
             <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded mb-4 w-1/3" />

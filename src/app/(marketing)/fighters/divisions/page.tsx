@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const metadata = {
   title: "UFC Weight Divisions | UFC Predict",
-  description: "Browse UFC fighters by weight division. Explore all UFC weight classes from Heavyweight to Flyweight and Women's divisions.",
+  description: "Browse UFC fighters by weight division. Explore all UFC weight classes from Heavyweight to Flyweight and Women&apos;s divisions.",
 };
 
 export default function DivisionsPage() {
@@ -49,8 +49,8 @@ export default function DivisionsPage() {
 
         <Tabs defaultValue="mens" className="w-full mb-12">
           <TabsList className="grid w-full grid-cols-2 mb-8">
-            <TabsTrigger value="mens" className="text-lg py-3">Men's Divisions</TabsTrigger>
-            <TabsTrigger value="womens" className="text-lg py-3">Women's Divisions</TabsTrigger>
+            <TabsTrigger value="mens" className="text-lg py-3">Men&apos;s Divisions</TabsTrigger>
+            <TabsTrigger value="womens" className="text-lg py-3">Women&apos;s Divisions</TabsTrigger>
           </TabsList>
           
           <TabsContent value="mens">
@@ -58,7 +58,7 @@ export default function DivisionsPage() {
               {/* Heavyweight Division */}
               <div className="bg-black/30 border border-red-500/20 rounded-lg overflow-hidden group">
                 <div className="relative h-48">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10" />
                   <Image 
                     src="/images/divisions/heavyweight.jpg" 
                     alt="UFC Heavyweight Division" 
@@ -89,7 +89,7 @@ export default function DivisionsPage() {
               {/* Light Heavyweight Division */}
               <div className="bg-black/30 border border-red-500/20 rounded-lg overflow-hidden group">
                 <div className="relative h-48">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10" />
                   <Image 
                     src="/images/divisions/light-heavyweight.jpg" 
                     alt="UFC Light Heavyweight Division" 
@@ -120,7 +120,7 @@ export default function DivisionsPage() {
               {/* Middleweight Division */}
               <div className="bg-black/30 border border-red-500/20 rounded-lg overflow-hidden group">
                 <div className="relative h-48">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10" />
                   <Image 
                     src="/images/divisions/middleweight.jpg" 
                     alt="UFC Middleweight Division" 
@@ -151,7 +151,7 @@ export default function DivisionsPage() {
               {/* Welterweight Division */}
               <div className="bg-black/30 border border-red-500/20 rounded-lg overflow-hidden group">
                 <div className="relative h-48">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10" />
                   <Image 
                     src="/images/divisions/welterweight.jpg" 
                     alt="UFC Welterweight Division" 
@@ -182,7 +182,7 @@ export default function DivisionsPage() {
               {/* Lightweight Division */}
               <div className="bg-black/30 border border-red-500/20 rounded-lg overflow-hidden group">
                 <div className="relative h-48">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10" />
                   <Image 
                     src="/images/divisions/lightweight.jpg" 
                     alt="UFC Lightweight Division" 
@@ -213,7 +213,7 @@ export default function DivisionsPage() {
               {/* Featherweight Division */}
               <div className="bg-black/30 border border-red-500/20 rounded-lg overflow-hidden group">
                 <div className="relative h-48">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10" />
                   <Image 
                     src="/images/divisions/featherweight.jpg" 
                     alt="UFC Featherweight Division" 
@@ -248,16 +248,16 @@ export default function DivisionsPage() {
               {/* Women's Bantamweight Division */}
               <div className="bg-black/30 border border-red-500/20 rounded-lg overflow-hidden group">
                 <div className="relative h-48">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10" />
                   <Image 
                     src="/images/divisions/womens-bantamweight.jpg" 
-                    alt="UFC Women's Bantamweight Division" 
+                    alt="UFC Women&apos;s Bantamweight Division" 
                     fill 
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
                 <div className="p-4">
-                  <h3 className="text-xl font-bold text-white mb-1">Women's Bantamweight</h3>
+                  <h3 className="text-xl font-bold text-white mb-1">Women&apos;s Bantamweight</h3>
                   <p className="text-gray-400 text-sm mb-3">135 lbs (61.2 kg)</p>
                   <p className="text-gray-300 mb-4 text-sm">
                     The division that rose to prominence with Ronda Rousey, featuring well-rounded fighters.
@@ -279,16 +279,16 @@ export default function DivisionsPage() {
               {/* Women's Flyweight Division */}
               <div className="bg-black/30 border border-red-500/20 rounded-lg overflow-hidden group">
                 <div className="relative h-48">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10" />
                   <Image 
                     src="/images/divisions/womens-flyweight.jpg" 
-                    alt="UFC Women's Flyweight Division" 
+                    alt="UFC Women&apos;s Flyweight Division" 
                     fill 
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
                 <div className="p-4">
-                  <h3 className="text-xl font-bold text-white mb-1">Women's Flyweight</h3>
+                  <h3 className="text-xl font-bold text-white mb-1">Women&apos;s Flyweight</h3>
                   <p className="text-gray-400 text-sm mb-3">125 lbs (56.7 kg)</p>
                   <p className="text-gray-300 mb-4 text-sm">
                     A relatively new division that has quickly become competitive with technical fighters.
@@ -310,19 +310,19 @@ export default function DivisionsPage() {
               {/* Women's Strawweight Division */}
               <div className="bg-black/30 border border-red-500/20 rounded-lg overflow-hidden group">
                 <div className="relative h-48">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10" />
                   <Image 
                     src="/images/divisions/womens-strawweight.jpg" 
-                    alt="UFC Women's Strawweight Division" 
+                    alt="UFC Women&apos;s Strawweight Division" 
                     fill 
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
                 <div className="p-4">
-                  <h3 className="text-xl font-bold text-white mb-1">Women's Strawweight</h3>
+                  <h3 className="text-xl font-bold text-white mb-1">Women&apos;s Strawweight</h3>
                   <p className="text-gray-400 text-sm mb-3">115 lbs (52.2 kg)</p>
                   <p className="text-gray-300 mb-4 text-sm">
-                    The lightest women's division, known for fast-paced action and technical striking.
+                    The lightest women&apos;s division, known for fast-paced action and technical striking.
                   </p>
                   <div className="flex items-center justify-between">
                     <div>

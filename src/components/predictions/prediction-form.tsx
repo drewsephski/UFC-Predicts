@@ -53,11 +53,12 @@ export const PredictionForm = ({ fighterId, fighterName, onSuccess }: Prediction
   
   return (
     <form onSubmit={handleSubmit} className="space-y-4 bg-black/50 p-4 rounded-lg border border-red-500/30">
-      <h3 className="text-lg font-bold">Predict {fighterName}'s Fight Outcome</h3>
+      <h3 className="text-lg font-bold">Predict {fighterName}&apos;s Fight Outcome</h3>
       
       <div className="space-y-2">
-        <label className="text-sm font-medium">Prediction</label>
+        <label htmlFor="prediction" className="text-sm font-medium">Prediction</label>
         <Input
+          id="prediction"
           value={prediction}
           onChange={(e) => setPrediction(e.target.value)}
           placeholder="e.g., Win by KO, Lose by submission"
@@ -67,10 +68,15 @@ export const PredictionForm = ({ fighterId, fighterName, onSuccess }: Prediction
       </div>
       
       <div className="space-y-2">
-        <label className="text-sm font-medium">Confidence ({confidence}%)</label>
+        <label htmlFor="confidence" className="text-sm font-medium">Confidence ({confidence}%)</label>
         <Slider
+          id="confidence"
           value={[confidence]}
-          onValueChange={(values) => setConfidence(values[0])}
+          onValueChange={(values) => {
+            if (values[0] !== undefined) {
+              setConfidence(values[0]);
+            }
+          }}
           min={0}
           max={100}
           step={1}
@@ -79,8 +85,9 @@ export const PredictionForm = ({ fighterId, fighterName, onSuccess }: Prediction
       </div>
       
       <div className="space-y-2">
-        <label className="text-sm font-medium">Notes (Optional)</label>
+        <label htmlFor="notes" className="text-sm font-medium">Notes (Optional)</label>
         <Textarea
+          id="notes"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Add any additional notes about your prediction..."

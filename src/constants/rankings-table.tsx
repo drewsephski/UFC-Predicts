@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { Trophy, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

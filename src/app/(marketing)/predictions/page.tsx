@@ -1,4 +1,4 @@
-import { FightPrediction } from "@/components";
+import { FightPredictionForm as FightPrediction } from "@/components";
 import { Particles } from "@/components/ui/particles";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

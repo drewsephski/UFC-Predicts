@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useUFC, Fighter } from '@/contexts/ufc-context';
+import { useUFC, type Fighter } from '@/contexts/ufc-context';
 import { Container } from '@/components';
 import { LoadingState, ErrorState } from '@/components/ui/loading-state';
 import { Input } from '@/components/ui/input';
@@ -22,10 +22,10 @@ const WEIGHT_DIVISIONS = [
   'Middleweight',
   'Light Heavyweight',
   'Heavyweight',
-  "Women's Strawweight",
-  "Women's Flyweight",
-  "Women's Bantamweight",
-  "Women's Featherweight"
+  "Women&apos;s Strawweight",
+  "Women&apos;s Flyweight",
+  "Women&apos;s Bantamweight",
+  "Women&apos;s Featherweight"
 ];
 
 const FightersPage = () => {
@@ -50,7 +50,7 @@ const FightersPage = () => {
         const query = searchQuery.toLowerCase();
         result = result.filter(fighter => 
           fighter.name.toLowerCase().includes(query) || 
-          (fighter.nickname && fighter.nickname.toLowerCase().includes(query))
+          fighter.nickname?.toLowerCase().includes(query)
         );
       }
       
@@ -201,9 +201,44 @@ const FightersPage = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {filteredFighters.map((fighter) => (
-                <FighterCard key={fighter.id} fighter={fighter} />
-              ))}
+              {filteredFighters.map((f) => {
+                const [firstName, ...lastNameParts] = f.name.split(' ');
+                const lastName = lastNameParts.join(' ');
+                const recordParts = f.record.split('-').map(Number);
+
+                const fighterForCard: import('@/types/mma').Fighter = {
+                  FighterId: Number.parseInt(f.id, 10),
+                  FirstName: firstName || null,
+                  LastName: lastName,
+                  Nickname: f.nickname ?? null,
+                  WeightClass: f.division,
+                  Wins: recordParts[0] || 0,
+                  Losses: recordParts[1] || 0,
+                  Draws: recordParts[2] || 0,
+                  // --- Fields from @/types/mma that are not directly in FightersPage's fighter structure ---
+                  // These would ideally come from the context or be fetched, setting to null/defaults for now
+                  BirthDate: null, // Or map f.country here if that was the intent in FighterCard
+                  Height: null, // Or map f.imageUrl if that was the intent
+                  Weight: null,
+                  Reach: null,
+                  NoContests: null,
+                  TechnicalKnockouts: f.knockouts || null,
+                  TechnicalKnockoutLosses: null,
+                  Submissions: f.submissions || null,
+                  SubmissionLosses: null,
+                  TitleWins: f.isChampion ? 1 : 0, // Simplified mapping for champion status
+                  TitleLosses: null,
+                  TitleDraws: null,
+                  CareerStats: null, // This is a big one, ideally fetched or part of the context data
+                };
+
+                return (
+                  <FighterCard 
+                    key={f.id} 
+                    fighter={fighterForCard}
+                  />
+                );
+              })}
             </div>
           )}
         </div>

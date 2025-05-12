@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState } from 'react'
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -163,7 +163,7 @@ export const FighterCard: React.FC<FighterCardProps> = ({
       {/* Fighter Modal */}
       <FighterModal
         isOpen={isModalOpen}
-        onClose={handleCloseModal}
+        onCloseAction={handleCloseModal}
         id={id}
         name={name}
         nickname={nickname}

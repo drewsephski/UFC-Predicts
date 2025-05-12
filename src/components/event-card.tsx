@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -64,7 +64,7 @@ export const EventCard: React.FC<EventCardProps> = ({
           fill
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
         <div className="absolute bottom-0 left-0 p-3 w-full">
           <h3 className="font-bold text-white text-lg">{name}</h3>
           <div className="flex items-center text-gray-300 text-sm">

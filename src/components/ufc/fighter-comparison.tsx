@@ -6,14 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Progress } from "../ui/progress";
 import Image from "next/image";
 import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
 import { TrendingUp } from "lucide-react";
-
-interface FighterStat {
-    name: string;
-    value: number;
-    color: string;
-}
 
 interface FighterData {
     id: string;
@@ -47,7 +40,7 @@ interface FighterComparisonProps {
     preSelectedFighters?: [string, string];
 }
 
-const FighterComparison = ({ fighters, preSelectedFighters }: FighterComparisonProps) => {
+export const FighterComparison = ({ fighters, preSelectedFighters }: FighterComparisonProps) => {
     const [fighter1Id, setFighter1Id] = useState<string>(preSelectedFighters?.[0] || "");
     const [fighter2Id, setFighter2Id] = useState<string>(preSelectedFighters?.[1] || "");
 
@@ -118,7 +111,7 @@ const FighterComparison = ({ fighters, preSelectedFighters }: FighterComparisonP
         let fighter1Points = 0;
         let fighter2Points = 0;
         
-        comparisonStats.forEach(stat => {
+        for (const stat of comparisonStats) {
             // For strikes absorbed, lower is better
             if (stat.name === "Strikes Absorbed Per Min") {
                 if (stat.fighter1.value < stat.fighter2.value) {
@@ -134,7 +127,7 @@ const FighterComparison = ({ fighters, preSelectedFighters }: FighterComparisonP
                     fighter2Points++;
                 }
             }
-        });
+        }
         
         const winnerName = fighter1Points > fighter2Points ? fighter1.name : fighter2.name;
         const winnerPoints = fighter1Points > fighter2Points ? fighter1Points : fighter2Points;
@@ -158,7 +151,7 @@ const FighterComparison = ({ fighters, preSelectedFighters }: FighterComparisonP
             <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
-                        <label className="text-sm font-medium mb-2 block">Fighter 1</label>
+                        <label htmlFor="fighter1-select" className="text-sm font-medium mb-2 block">Fighter 1</label>
                         <Select value={fighter1Id} onValueChange={setFighter1Id}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select a fighter" />
@@ -186,7 +179,7 @@ const FighterComparison = ({ fighters, preSelectedFighters }: FighterComparisonP
                                     <div>
                                         <h3 className="font-bold text-lg">{fighter1.name}</h3>
                                         {fighter1.nickname && (
-                                            <p className="text-sm italic">"{fighter1.nickname}"</p>
+                                            <p className="text-sm italic">&quot;{fighter1.nickname}&quot;</p>
                                         )}
                                         <div className="flex items-center gap-2 mt-1">
                                             <Badge variant="outline">{fighter1.division}</Badge>
@@ -224,7 +217,7 @@ const FighterComparison = ({ fighters, preSelectedFighters }: FighterComparisonP
                     </div>
                     
                     <div>
-                        <label className="text-sm font-medium mb-2 block">Fighter 2</label>
+                        <label htmlFor="fighter2-select" className="text-sm font-medium mb-2 block">Fighter 2</label>
                         <Select value={fighter2Id} onValueChange={setFighter2Id}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select a fighter" />
@@ -252,7 +245,7 @@ const FighterComparison = ({ fighters, preSelectedFighters }: FighterComparisonP
                                     <div>
                                         <h3 className="font-bold text-lg">{fighter2.name}</h3>
                                         {fighter2.nickname && (
-                                            <p className="text-sm italic">"{fighter2.nickname}"</p>
+                                            <p className="text-sm italic">&quot;{fighter2.nickname}&quot;</p>
                                         )}
                                         <div className="flex items-center gap-2 mt-1">
                                             <Badge variant="outline">{fighter2.division}</Badge>
@@ -294,8 +287,8 @@ const FighterComparison = ({ fighters, preSelectedFighters }: FighterComparisonP
                     <>
                         <h3 className="font-bold text-lg mb-4">Stats Comparison</h3>
                         <div className="space-y-6">
-                            {comparisonStats.map((stat, index) => (
-                                <div key={index} className="space-y-2">
+                            {comparisonStats.map((stat) => (
+                                <div key={`${stat.name}-${stat.fighter1.value}-${stat.fighter2.value}`} className="space-y-2">
                                     <div className="flex justify-between text-sm">
                                         <span>{stat.name}</span>
                                         <div className="flex gap-4">

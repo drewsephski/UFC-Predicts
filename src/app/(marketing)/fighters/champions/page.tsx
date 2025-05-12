@@ -1,6 +1,6 @@
 import { Particles } from "@/components/ui/particles";
 import { Button } from "@/components/ui/button";
-import { Trophy, Dumbbell, Award, Medal, Crown } from "lucide-react";
+import { Trophy } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
@@ -48,13 +48,13 @@ export default function ChampionsPage() {
 
         {/* Men's Champions */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold mb-6 text-white text-center">Men's <span className="text-red-500">Champions</span></h2>
+          <h2 className="text-2xl font-bold mb-6 text-white text-center">Men&apos;s <span className="text-red-500">Champions</span></h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Heavyweight Champion */}
             <div className="bg-black/30 border border-red-500/20 rounded-lg overflow-hidden group">
               <div className="relative h-64">
-                <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10" />
                 <Image 
                   src="/images/champions/heavyweight.jpg" 
                   alt="UFC Heavyweight Champion" 
@@ -85,7 +85,7 @@ export default function ChampionsPage() {
             {/* Light Heavyweight Champion */}
             <div className="bg-black/30 border border-red-500/20 rounded-lg overflow-hidden group">
               <div className="relative h-64">
-                <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10" />
                 <Image 
                   src="/images/champions/light-heavyweight.jpg" 
                   alt="UFC Light Heavyweight Champion" 
@@ -116,7 +116,7 @@ export default function ChampionsPage() {
             {/* Middleweight Champion */}
             <div className="bg-black/30 border border-red-500/20 rounded-lg overflow-hidden group">
               <div className="relative h-64">
-                <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10" />
                 <Image 
                   src="/images/champions/middleweight.jpg" 
                   alt="UFC Middleweight Champion" 
@@ -147,7 +147,7 @@ export default function ChampionsPage() {
             {/* Welterweight Champion */}
             <div className="bg-black/30 border border-red-500/20 rounded-lg overflow-hidden group">
               <div className="relative h-64">
-                <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10" />
                 <Image 
                   src="/images/champions/welterweight.jpg" 
                   alt="UFC Welterweight Champion" 
@@ -179,13 +179,13 @@ export default function ChampionsPage() {
 
         {/* Women's Champions */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold mb-6 text-white text-center">Women's <span className="text-red-500">Champions</span></h2>
+          <h2 className="text-2xl font-bold mb-6 text-white text-center">Women&apos;s <span className="text-red-500">Champions</span></h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Women's Bantamweight Champion */}
             <div className="bg-black/30 border border-red-500/20 rounded-lg overflow-hidden group">
               <div className="relative h-64">
-                <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10" />
                 <Image 
                   src="/images/champions/womens-bantamweight.jpg" 
                   alt="UFC Women's Bantamweight Champion" 
@@ -193,7 +193,7 @@ export default function ChampionsPage() {
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-20">
-                  Women's Bantamweight
+                  Women&apos;s Bantamweight
                 </div>
               </div>
               <div className="p-4 relative">
@@ -216,7 +216,7 @@ export default function ChampionsPage() {
             {/* Women's Flyweight Champion */}
             <div className="bg-black/30 border border-red-500/20 rounded-lg overflow-hidden group">
               <div className="relative h-64">
-                <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10" />
                 <Image 
                   src="/images/champions/womens-flyweight.jpg" 
                   alt="UFC Women's Flyweight Champion" 
@@ -224,7 +224,7 @@ export default function ChampionsPage() {
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-20">
-                  Women's Flyweight
+                  Women&apos;s Flyweight
                 </div>
               </div>
               <div className="p-4 relative">
@@ -247,7 +247,7 @@ export default function ChampionsPage() {
             {/* Women's Strawweight Champion */}
             <div className="bg-black/30 border border-red-500/20 rounded-lg overflow-hidden group">
               <div className="relative h-64">
-                <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10" />
                 <Image 
                   src="/images/champions/womens-strawweight.jpg" 
                   alt="UFC Women's Strawweight Champion" 
@@ -255,7 +255,7 @@ export default function ChampionsPage() {
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-20">
-                  Women's Strawweight
+                  Women&apos;s Strawweight
                 </div>
               </div>
               <div className="p-4 relative">

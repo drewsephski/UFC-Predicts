@@ -59,7 +59,7 @@ export default function FighterSearchPage() {
   const filteredResults = mockResults.filter(fighter => {
     const matchesSearch = searchQuery === "" || 
       fighter.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (fighter.nickname && fighter.nickname.toLowerCase().includes(searchQuery.toLowerCase()));
+      fighter.nickname?.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesDivision = division === "all" || fighter.division.toLowerCase() === division.toLowerCase();
     const matchesCountry = country === "all" || fighter.country.toLowerCase() === country.toLowerCase();
@@ -136,9 +136,9 @@ export default function FighterSearchPage() {
                   <SelectItem value="featherweight">Featherweight</SelectItem>
                   <SelectItem value="bantamweight">Bantamweight</SelectItem>
                   <SelectItem value="flyweight">Flyweight</SelectItem>
-                  <SelectItem value="women's bantamweight">Women's Bantamweight</SelectItem>
-                  <SelectItem value="women's flyweight">Women's Flyweight</SelectItem>
-                  <SelectItem value="women's strawweight">Women's Strawweight</SelectItem>
+                  <SelectItem value="women's bantamweight">Women&apos;s Bantamweight</SelectItem>
+                  <SelectItem value="women's flyweight">Women&apos;s Flyweight</SelectItem>
+                  <SelectItem value="women's strawweight">Women&apos;s Strawweight</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -197,7 +197,7 @@ export default function FighterSearchPage() {
               {filteredResults.map((fighter) => (
                 <Card key={fighter.id} className="bg-black/30 border border-red-500/20 overflow-hidden group">
                   <div className="relative h-64">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10" />
                     <Image 
                       src={fighter.image} 
                       alt={fighter.name} 
@@ -211,7 +211,7 @@ export default function FighterSearchPage() {
                   <div className="p-4">
                     <h3 className="text-xl font-bold text-white">{fighter.name}</h3>
                     {fighter.nickname && (
-                      <p className="text-red-400 text-sm mb-2">"{fighter.nickname}"</p>
+                      <p className="text-red-400 text-sm mb-2">&quot;{fighter.nickname}&quot;</p>
                     )}
                     <div className="flex items-center text-gray-400 text-sm mb-3">
                       <span className="mr-3">{fighter.record}</span>

@@ -1,13 +1,13 @@
 "use client";
 
 import { useFighters } from "@/hooks";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { FighterCard } from "./fighter-card";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { UFC_WEIGHT_DIVISIONS } from "@/constants";
 import LoadingIcon from "../ui/loading-icon";
-import { useDebounce } from "usehooks-ts";
+import { useDebounce } from "@uidotdev/usehooks";
 
 interface FighterGridProps {
   initialDivision?: string;
@@ -20,7 +20,7 @@ interface FighterGridProps {
 export const FighterGrid = ({ initialDivision, favorites }: FighterGridProps) => {
   const [division, setDivision] = useState<string | undefined>(initialDivision);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const debouncedSearchQuery = useDebounce<string>(searchQuery, 300);
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
 
   const { fighters, isLoading, error } = useFighters({ division });
 
@@ -30,10 +30,11 @@ export const FighterGrid = ({ initialDivision, favorites }: FighterGridProps) =>
   useEffect(() => {
     if (fighters) {
       setIsSearching(true);
+      const query = (debouncedSearchQuery || "").toLowerCase();
       setFilteredFighters(
         fighters.filter(fighter =>
-          fighter.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-          (fighter.nickname && fighter.nickname.toLowerCase().includes(debouncedSearchQuery.toLowerCase()))
+          fighter.name.toLowerCase().includes(query) ||
+          fighter.nickname?.toLowerCase().includes(query)
         )
       );
       setIsSearching(false);
@@ -57,9 +58,9 @@ export const FighterGrid = ({ initialDivision, favorites }: FighterGridProps) =>
             type="search"
           />
           <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
           </div>
           {searchQuery && (
@@ -69,9 +70,9 @@ export const FighterGrid = ({ initialDivision, favorites }: FighterGridProps) =>
               onClick={() => setSearchQuery("")}
               aria-label="Clear search"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             </button>
           )}
@@ -110,13 +111,41 @@ export const FighterGrid = ({ initialDivision, favorites }: FighterGridProps) =>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-          {filteredFighters.map((fighter) => (
-            <FighterCard
-              key={fighter.id}
-              {...fighter}
-              favoriteId={favorites?.find(fav => fav.fighterId === fighter.id)?.id}
-            />
-          ))}
+          {filteredFighters.map((fighter) => {
+            const recordParts = (fighter.record || "0-0-0").split('-').map(p => Number.parseInt(p, 10) || 0);
+            const firstName = fighter.name.split(' ')[0] || null;
+            const lastName = fighter.name.split(' ').slice(1).join(' ') || "";
+
+            return (
+              <FighterCard
+                key={fighter.id}
+                fighter={{
+                  FighterId: Number.parseInt(fighter.id, 10),
+                  FirstName: firstName,
+                  LastName: lastName,
+                  Nickname: fighter.nickname || null,
+                  WeightClass: fighter.division,
+                  Wins: recordParts[0],
+                  Losses: recordParts[1],
+                  Draws: recordParts[2],
+                  BirthDate: null,
+                  Height: null,
+                  Weight: null,
+                  Reach: null,
+                  NoContests: null,
+                  TechnicalKnockouts: null,
+                  TechnicalKnockoutLosses: null,
+                  Submissions: null,
+                  SubmissionLosses: null,
+                  TitleWins: fighter.isChampion ? 1 : 0,
+                  TitleLosses: null,
+                  TitleDraws: null,
+                  CareerStats: null
+                }}
+                favoriteId={favorites?.find(fav => fav.fighterId === fighter.id)?.id}
+              />
+            );
+          })}
         </div>
       )}
     </div>

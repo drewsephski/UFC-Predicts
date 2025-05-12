@@ -77,7 +77,7 @@ const FighterCard = ({
                         <div>
                             <CardTitle className="text-xl font-bold text-white">{name}</CardTitle>
                             {nickname && (
-                                <CardDescription className="text-sm italic text-red-400">"{nickname}"</CardDescription>
+                                <CardDescription className="text-sm italic text-red-400">&quot;{nickname}&quot;</CardDescription>
                             )}
                         </div>
                         <div className="flex items-center text-sm text-gray-300">

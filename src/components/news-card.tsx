@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -44,7 +44,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({
           fill
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
         {isFeatured && (
           <div className="absolute top-2 right-2">
             <Badge className="bg-red-600 text-white border-none">

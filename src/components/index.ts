@@ -38,6 +38,11 @@ import { HeaderDropdown } from "./ui/header-dropdown";
 // Import sitemap components
 import { Sitemap, SitemapCategory } from "./sitemap/sitemap";
 
+// UFC specific components that were missing
+export { FighterComparison } from "./ufc/fighter-comparison";
+export { default as NewsCard } from "./ufc/news-card";
+export { default as RankingsTable } from "./ufc/rankings-table";
+
 export {
     // Global components
     Icons,
