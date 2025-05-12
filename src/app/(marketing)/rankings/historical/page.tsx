@@ -1,3 +1,4 @@
+
 import { RankingsTable } from "@/components";
 import { Particles } from "@/components/ui/particles";
 import { Button } from "@/components/ui/button";
@@ -306,13 +307,15 @@ export default function HistoricalRankingsPage() {
               </div>
             </div>
             
-            <div className="bg-black/30 border border-red-500/20 rounded-lg p-6 mb-8">
-              <RankingsTable 
-                division="Heavyweight (2023)"
-                champion={HISTORICAL_CHAMPIONS.heavyweight[0].champion}
-                rankings={HISTORICAL_CHAMPIONS.heavyweight[0].rankings}
-              />
-            </div>
+            {HISTORICAL_CHAMPIONS.heavyweight?.[0]?.champion && (
+              <div className="bg-black/30 border border-red-500/20 rounded-lg p-6 mb-8">
+                <RankingsTable 
+                  division="Heavyweight (2023)"
+                  champion={(HISTORICAL_CHAMPIONS.heavyweight[0] as typeof HISTORICAL_CHAMPIONS.heavyweight[0]).champion}
+                  rankings={(HISTORICAL_CHAMPIONS.heavyweight[0] as typeof HISTORICAL_CHAMPIONS.heavyweight[0]).rankings}
+                />
+              </div>
+            )}
             
             <div className="bg-black/30 border border-red-500/20 rounded-lg p-6 mb-12">
               <h2 className="text-2xl font-bold mb-4 text-white">
@@ -320,7 +323,7 @@ export default function HistoricalRankingsPage() {
               </h2>
               
               <div className="relative">
-                <div className="absolute left-4 h-full w-0.5 bg-red-500/30"></div>
+                <div className="absolute left-4 h-full w-0.5 bg-red-500/30" />
                 
                 <div className="relative pl-10 pb-10">
                   <div className="absolute left-0 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
@@ -358,16 +361,14 @@ export default function HistoricalRankingsPage() {
                   </div>
                 </div>
                 
-                <div className="relative pl-10">
-                  <div className="absolute left-0 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold">4</span>
-                  </div>
-                  <div className="bg-black/50 p-4 rounded-lg border border-red-500/10">
-                    <h3 className="text-lg font-bold text-white">Daniel Cormier (2018-2019)</h3>
-                    <p className="text-gray-400 text-sm mt-1">
-                      Knocked out Stipe Miocic at UFC 226 to become a two-division champion. Defended once against Derrick Lewis at UFC 230.
-                    </p>
-                  </div>
+                <div className="relative left-0 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold">4</span>
+                </div>
+                <div className="bg-black/50 p-4 rounded-lg border border-red-500/10">
+                  <h3 className="text-lg font-bold text-white">Daniel Cormier (2018-2019)</h3>
+                  <p className="text-gray-400 text-sm mt-1">
+                    Knocked out Stipe Miocic at UFC 226 to become a two-division champion. Defended once against Derrick Lewis at UFC 230.
+                  </p>
                 </div>
               </div>
             </div>
@@ -411,8 +412,13 @@ export default function HistoricalRankingsPage() {
             <div className="bg-black/30 border border-red-500/20 rounded-lg p-6 mb-8">
               <RankingsTable 
                 division="Heavyweight (End of 2023)"
-                champion={HISTORICAL_CHAMPIONS.heavyweight[0].champion}
-                rankings={HISTORICAL_CHAMPIONS.heavyweight[0].rankings}
+                champion={HISTORICAL_CHAMPIONS.heavyweight?.[0]?.champion || {
+                  id: "vacant",
+                  name: "Vacant",
+                  country: "N/A",
+                  record: "0-0-0"
+                }}
+                rankings={HISTORICAL_CHAMPIONS.heavyweight?.[0]?.rankings || []}
               />
             </div>
             

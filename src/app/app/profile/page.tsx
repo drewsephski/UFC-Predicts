@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { FighterCard } from "@/components/fighters/fighter-card";
 import LoadingIcon from "@/components/ui/loading-icon";
 import { toast } from "sonner";
-import { UserCircle, Heart, TrendingUp, Settings } from "lucide-react";
+import { Heart, TrendingUp, Settings } from "lucide-react";
 
 export default function ProfilePage() {
   const { profile, isLoading, error, updateProfile, refreshProfile } = useUserProfile();
@@ -149,36 +149,21 @@ export default function ProfilePage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
               {profile.favorites.map((favorite) => {
-                const recordString = favorite.fighter.record || "0-0-0";
-                const recordParts = recordString.split('-').map(part => Number.parseInt(part, 10) || 0);
-                const firstName = favorite.fighter.name.split(' ')[0] || null;
-                const lastName = favorite.fighter.name.split(' ').slice(1).join(' ') || "";
-
                 return (
                   <FighterCard
                     key={favorite.id}
                     fighter={{
                       FighterId: Number(favorite.fighter.id),
-                      FirstName: firstName,
-                      LastName: lastName,
+                      FirstName: favorite.fighter.name.split(' ')[0] || null,
+                      LastName: favorite.fighter.name.split(' ').slice(1).join(' ') || null,
                       Nickname: favorite.fighter.nickname || null,
                       WeightClass: favorite.fighter.division || null,
-                      Wins: recordParts[0],
-                      Losses: recordParts[1],
-                      Draws: recordParts[2],
+                      Wins: Number.parseInt(favorite.fighter.record.split('-')[0] || '0'),
+                      Losses: Number.parseInt(favorite.fighter.record.split('-')[1] || '0'),
+                      Draws: Number.parseInt(favorite.fighter.record.split('-')[2] || '0'),
                       BirthDate: favorite.fighter.country || null,
                       TitleWins: favorite.fighter.isChampion ? 1 : 0,
-                      CareerStats: null,
-                      Height: null,
-                      Weight: null,
-                      Reach: null,
-                      NoContests: null,
-                      TechnicalKnockouts: null,
-                      TechnicalKnockoutLosses: null,
-                      Submissions: null,
-                      SubmissionLosses: null,
-                      TitleLosses: null,
-                      TitleDraws: null
+                      CareerStats: null
                     }}
                     favoriteId={favorite.id}
                   />
