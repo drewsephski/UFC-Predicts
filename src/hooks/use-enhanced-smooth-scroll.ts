@@ -1,12 +1,25 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { smoothScroll as smoothScrollUtil } from '@/lib/smooth-scroll';
+
+export type EasingFunction = 'linear' | 'easeInQuad' | 'easeOutQuad' | 'easeInOutQuad' | 'easeInCubic' | 'easeOutCubic' | 'easeInOutCubic';
 
 interface SmoothScrollOptions {
+  /** Offset from the top of the target element (in pixels) */
   offset?: number;
+  /** Duration of the scroll animation (in milliseconds) */
   duration?: number;
-  easing?: 'linear' | 'easeInQuad' | 'easeOutQuad' | 'easeInOutQuad';
+  /** Easing function for the scroll animation */
+  easing?: EasingFunction;
+  /** Whether to update the URL hash when scrolling */
   updateURL?: boolean;
+  /** Whether to add smooth scrolling to all anchor links */
+  initAnchorLinks?: boolean;
+  /** Callback when scroll starts */
+  onScrollStart?: () => void;
+  /** Callback when scroll completes */
+  onScrollComplete?: () => void;
 }
 
 /**
@@ -17,28 +30,31 @@ interface SmoothScrollOptions {
  */
 export const useEnhancedSmoothScroll = (options: SmoothScrollOptions = {}) => {
   const {
-    offset = 0,
-    duration = 800,
+    offset = 80, // Default offset for fixed headers
+    duration = 600,
     easing = 'easeInOutQuad',
     updateURL = true,
+    initAnchorLinks = true,
+    onScrollStart,
+    onScrollComplete,
   } = options;
 
   const [isScrolling, setIsScrolling] = useState(false);
-  const [lastScrollTarget, setLastScrollTarget] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const sectionElementsRef = useRef<Map<string, HTMLElement>>(new Map());
+  const lastScrollTarget = useRef<string | null>(null);
 
-  // Easing functions
+  // Easing functions map
   const easingFunctions = useMemo(() => ({
-    // No acceleration
     linear: (t: number) => t,
-
-    // Accelerating from zero velocity
     easeInQuad: (t: number) => t * t,
-
-    // Decelerating to zero velocity
     easeOutQuad: (t: number) => t * (2 - t),
-
-    // Acceleration until halfway, then deceleration
     easeInOutQuad: (t: number) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
+    easeInCubic: (t: number) => t * t * t,
+    easeOutCubic: (t: number) => (--t) * t * t + 1,
+    easeInOutCubic: (t: number) => t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1,
   }), []);
 
   // Function to scroll to an element by its ID
@@ -50,98 +66,188 @@ export const useEnhancedSmoothScroll = (options: SmoothScrollOptions = {}) => {
       return;
     }
 
-    setIsScrolling(true);
-    setLastScrollTarget(elementId);
+    // Update the last scroll target
+    lastScrollTarget.current = elementId;
 
-    const startPosition = window.scrollY;
-    const targetPosition = element.getBoundingClientRect().top + window.scrollY - offset;
-    const distance = targetPosition - startPosition;
-    let startTime: number | null = null;
-
-    const animateScroll = (currentTime: number) => {
-      if (startTime === null) startTime = currentTime;
-      const timeElapsed = currentTime - startTime;
-      const progress = Math.min(timeElapsed / duration, 1);
-      const easedProgress = easingFunctions[easing](progress);
-
-      window.scrollTo(0, startPosition + distance * easedProgress);
-
-      if (timeElapsed < duration) {
-        requestAnimationFrame(animateScroll);
-      } else {
-        // Update URL if option is enabled
-        if (updateURL) {
-          window.history.pushState({}, '', `#${elementId}`);
-        }
-
-        setIsScrolling(false);
-      }
-    };
-
-    requestAnimationFrame(animateScroll);
-  }, [offset, duration, easing, updateURL, easingFunctions]);
-
-  // Function to scroll to a specific position
-  const scrollToPosition = useCallback((targetY: number) => {
+    // Call the scroll start callback
+    onScrollStart?.();
     setIsScrolling(true);
 
-    const startPosition = window.scrollY;
-    const distance = targetY - startPosition;
-    let startTime: number | null = null;
+    // Get the easing function
+    const ease = easingFunctions[easing] || easingFunctions.easeInOutQuad;
 
-    const animateScroll = (currentTime: number) => {
-      if (startTime === null) startTime = currentTime;
-      const timeElapsed = currentTime - startTime;
-      const progress = Math.min(timeElapsed / duration, 1);
-      const easedProgress = easingFunctions[easing](progress);
-
-      window.scrollTo(0, startPosition + distance * easedProgress);
-
-      if (timeElapsed < duration) {
-        requestAnimationFrame(animateScroll);
-      } else {
+    // Use the smooth scroll utility
+    smoothScrollUtil({
+      target: element,
+      offset,
+      duration,
+      easing: ease,
+      onComplete: () => {
         setIsScrolling(false);
-      }
-    };
+        onScrollComplete?.();
+      },
+    });
+  }, [duration, easing, easingFunctions, offset, onScrollStart, onScrollComplete]);
 
-    requestAnimationFrame(animateScroll);
-  }, [duration, easing, easingFunctions]);
-
-  // Handle clicks on anchor links
+  // Cleanup function
   useEffect(() => {
-    const handleAnchorClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const anchor = target.closest('a');
-
-      if (anchor?.hash && anchor?.pathname === window.location.pathname) {
-        e.preventDefault();
-        const id = anchor.hash.substring(1);
-        scrollToElement(id);
-      }
-    };
-
-    document.addEventListener('click', handleAnchorClick);
+    const timeout = scrollTimeoutRef.current;
+    const observer = observerRef.current;
 
     return () => {
-      document.removeEventListener('click', handleAnchorClick);
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+      if (observer) {
+        observer.disconnect();
+      }
     };
-  }, [scrollToElement]);
+  }, []);
 
-  // Handle initial load with hash in URL
+  // Initialize intersection observer for section tracking
   useEffect(() => {
-    if (window.location.hash) {
-      const id = window.location.hash.substring(1);
-      // Small delay to ensure the page is fully loaded
-      setTimeout(() => {
-        scrollToElement(id);
-      }, 100);
+    if (typeof window === 'undefined') return;
+
+    const handleIntersect = (entries: IntersectionObserverEntry[]) => {
+      if (isScrolling) return; // Don't update active section during programmatic scrolls
+
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          if (id) {
+            setActiveSection(id);
+
+            if (updateURL) {
+              // Update URL without triggering scroll
+              const url = new URL(window.location.href);
+              url.hash = `#${id}`;
+              window.history.replaceState({}, '', url.toString());
+            }
+            break;
+          }
+        }
+      }
+    };
+
+    // Create observer with configurable threshold
+    observerRef.current = new IntersectionObserver(handleIntersect, {
+      root: null,
+      rootMargin: `-${offset}px 0px -${window.innerHeight - offset - 100}px`,
+      threshold: 0.1,
+    });
+
+    // Observe all sections with IDs
+    sectionElementsRef.current.forEach((element) => {
+      observerRef.current?.observe(element);
+    });
+
+    // Handle initial hash if present
+    const handleInitialHash = () => {
+      const hash = window.location.hash.substring(1);
+      if (hash) {
+        // Small delay to ensure the page is fully loaded
+        setTimeout(() => {
+          scrollToElement(hash);
+        }, 100);
+      }
+    };
+
+    // Run after a short delay to ensure all elements are mounted
+    const timeoutId = setTimeout(handleInitialHash, 100);
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+      clearTimeout(timeoutId);
+    };
+  }, [offset, scrollToElement, updateURL, isScrolling]);
+
+  // Initialize anchor links
+  useEffect(() => {
+    if (!initAnchorLinks || typeof document === 'undefined') return;
+
+    const handleClick = (e: Event) => {
+      const target = e.target as HTMLElement;
+      const anchor = target.closest('a[href^="#"]') as HTMLAnchorElement;
+
+      if (anchor && anchor.getAttribute('href') !== '#') {
+        e.preventDefault();
+        const targetId = anchor.getAttribute('href');
+
+        if (targetId) {
+          scrollToElement(targetId.replace('#', ''));
+        }
+      }
+    };
+
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, [initAnchorLinks, scrollToElement]);
+
+  // Register sections to observe
+  const registerSection = useCallback((element: HTMLElement | null, id?: string) => {
+    if (!element) return;
+
+    const elementId = id || element.id;
+    if (!elementId) return;
+
+    sectionElementsRef.current.set(elementId, element);
+
+    // Observe the element if observer is available
+    if (observerRef.current) {
+      observerRef.current.observe(element);
     }
-  }, [scrollToElement]);
+
+    return () => {
+      sectionElementsRef.current.delete(elementId);
+      if (observerRef.current) {
+        observerRef.current.unobserve(element);
+      }
+    };
+  }, []);
+
+  // Function to scroll to a section by ID
+  const scrollToSection = useCallback((sectionId: string, options: Partial<SmoothScrollOptions> = {}) => {
+    const {
+      offset: customOffset = offset,
+      duration: customDuration = duration,
+      easing: customEasing = easing,
+    } = options;
+
+    const element = document.getElementById(sectionId);
+    if (!element) {
+      console.warn(`Section with ID "${sectionId}" not found.`);
+      return;
+    }
+
+    // Update the last scroll target
+    lastScrollTarget.current = sectionId;
+    onScrollStart?.();
+    setIsScrolling(true);
+
+    const ease = typeof customEasing === 'string'
+      ? (easingFunctions[customEasing] || easingFunctions.easeInOutQuad)
+      : customEasing;
+
+    smoothScrollUtil({
+      target: element,
+      offset: customOffset,
+      duration: customDuration,
+      easing: ease,
+      onComplete: () => {
+        setIsScrolling(false);
+        onScrollComplete?.();
+      },
+    });
+  }, [duration, easing, easingFunctions, offset, onScrollComplete, onScrollStart]);
 
   return {
-    scrollToElement,
-    scrollToPosition,
     isScrolling,
-    lastScrollTarget
+    activeSection,
+    scrollToElement,
+    scrollToSection,
+    registerSection,
+    lastScrollTarget: lastScrollTarget.current
   };
 };

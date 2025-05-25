@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800px" height="800px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>User Placeholder</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="User-Circle" fill="#9CA3AF" fill-rule="nonzero">
+            <path d="M12,0 C5.373,0 0,5.373 0,12 C0,18.627 5.373,24 12,24 C18.627,24 24,18.627 24,12 C24,5.373 18.627,0 12,0 Z M12,4.8 C14.21,4.8 16,6.59 16,8.8 C16,11.01 14.21,12.8 12,12.8 C9.79,12.8 8,11.01 8,8.8 C8,6.59 9.79,4.8 12,4.8 Z M12,21.6 C9.6,21.6 7.2,20.7 5.4,19.1 C6.9,17.2 9.3,16 12,16 C14.7,16 17.1,17.2 18.6,19.1 C16.8,20.7 14.4,21.6 12,21.6 Z" id="Shape"></path>
+        </g>
+    </g>
+</svg>

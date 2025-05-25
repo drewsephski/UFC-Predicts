@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     const user = await db.user.findUnique({
       where: { clerkId: userId },
       include: {
-        predictions: {
+        fightPicks: {
           include: { fighter: true },
           orderBy: { createdAt: 'desc' }
         },
@@ -29,20 +29,20 @@ export async function GET(req: NextRequest) {
     }
     
     // Calculate prediction stats
-    const totalPredictions = user.predictions.length;
-    const correctPredictions = user.predictions.filter(p => p.isCorrect).length;
-    const accuracy = totalPredictions > 0 ? (correctPredictions / totalPredictions) * 100 : 0;
+    const totalFightPicks = user.fightPicks.length;
+    const correctFightPicks = user.fightPicks.filter(p => p.isCorrect).length;
+    const accuracy = totalFightPicks > 0 ? (correctFightPicks / totalFightPicks) * 100 : 0;
     
     return NextResponse.json({
       id: user.id,
       email: user.email,
       name: user.name,
       avatar: user.avatar,
-      predictions: user.predictions,
+      fightPicks: user.fightPicks,
       favorites: user.favorites,
       stats: {
-        totalPredictions,
-        correctPredictions,
+        totalFightPicks,
+        correctFightPicks,
         accuracy: Math.round(accuracy * 10) / 10, // Round to 1 decimal place
       }
     });

@@ -1,8 +1,7 @@
 import { db } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import type { Prisma } from "@prisma/client"; // Assuming this import is still needed for the type assertion
-import type { Fight, Event } from '@/contexts/ufc-context';
+import type { Prisma } from "@prisma/client";
 
 export async function GET(
   req: NextRequest,
@@ -11,7 +10,16 @@ export async function GET(
   try {
     const id = params.id;
 
-    const event = await db.event.findUnique({
+    const event: Prisma.EventGetPayload<{
+      include: {
+        fights: {
+          include: {
+            redCorner: true;
+            blueCorner: true;
+          };
+        };
+      };
+    }> | null = await db.event.findUnique({
       where: { id },
       include: {
         fights: {
@@ -36,14 +44,20 @@ export async function GET(
     // Transform the data to match the expected format in the frontend
     const mainCard = event.fights.filter(fight => fight.isMainEvent || fight.isTitleFight).map(fight => ({
       ...fight,
-      fighter1: fight.redCorner,
-      fighter2: fight.blueCorner
+      redCorner: fight.redCorner,
+      blueCorner: fight.blueCorner,
+      redCornerId: fight.redCornerId,
+      blueCornerId: fight.blueCornerId,
+      date: event.date.toISOString(),
     }));
 
     const prelimCard = event.fights.filter(fight => !fight.isMainEvent && !fight.isTitleFight).map(fight => ({
       ...fight,
-      fighter1: fight.redCorner,
-      fighter2: fight.blueCorner
+      redCorner: fight.redCorner,
+      blueCorner: fight.blueCorner,
+      redCornerId: fight.redCornerId,
+      blueCornerId: fight.blueCornerId,
+      date: event.date.toISOString(),
     }));
 
     const formattedEvent = {

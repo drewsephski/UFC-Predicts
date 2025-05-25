@@ -28,54 +28,54 @@ const FightGrid = ({
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [showOnlyMainEvents, setShowOnlyMainEvents] = useState<boolean>(false);
   const [showOnlyTitleFights, setShowOnlyTitleFights] = useState<boolean>(false);
-  
+
   const { fights, isLoading, error } = useFights({
     eventId,
     upcoming,
     completed,
   });
-  
+
   const [filteredFights, setFilteredFights] = useState(fights);
-  
+
   useEffect(() => {
     if (fights) {
       let filtered = [...fights];
-      
+
       // Filter by weight class
       if (weightClass) {
-        filtered = filtered.filter(fight => 
+        filtered = filtered.filter(fight =>
           fight.weightClass.toLowerCase() === weightClass.toLowerCase()
         );
       }
-      
+
       // Filter by search query (fighter names)
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
-        filtered = filtered.filter(fight => 
-          fight.redCorner.name.toLowerCase().includes(query) || 
+        filtered = filtered.filter(fight =>
+          fight.redCorner.name.toLowerCase().includes(query) ||
           fight.blueCorner.name.toLowerCase().includes(query)
         );
       }
-      
+
       // Filter by main events
       if (showOnlyMainEvents) {
         filtered = filtered.filter(fight => fight.isMainEvent);
       }
-      
+
       // Filter by title fights
       if (showOnlyTitleFights) {
         filtered = filtered.filter(fight => fight.isTitleFight);
       }
-      
+
       // Apply limit if provided
       if (limit && filtered.length > limit) {
         filtered = filtered.slice(0, limit);
       }
-      
+
       setFilteredFights(filtered);
     }
   }, [fights, weightClass, searchQuery, showOnlyMainEvents, showOnlyTitleFights, limit]);
-  
+
   const weightClasses = [
     "Flyweight",
     "Bantamweight",
@@ -90,20 +90,20 @@ const FightGrid = ({
     "Women&apos;s Bantamweight",
     "Women&apos;s Featherweight",
   ];
-  
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {Array.from({ length: 6 }).map((_, index) => (
-          <Skeleton 
-            key={index} 
+          <Skeleton
+            key={index}
             className="w-full h-[400px] rounded-xl bg-black/40 border border-red-500/20"
           />
         ))}
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <div className="text-center py-10">
@@ -111,21 +111,21 @@ const FightGrid = ({
       </div>
     );
   }
-  
+
   if (fights.length === 0) {
     return (
       <div className="text-center py-10">
         <CalendarRange className="w-12 h-12 text-red-500/50 mx-auto mb-4" />
         <h3 className="text-xl font-bold text-white mb-2">No Fights Found</h3>
         <p className="text-gray-400">
-          {upcoming ? "There are no upcoming fights scheduled at this time." : 
-           completed ? "No completed fights match your criteria." : 
+          {upcoming ? "There are no upcoming fights scheduled at this time." :
+           completed ? "No completed fights match your criteria." :
            "No fights match your search criteria."}
         </p>
       </div>
     );
   }
-  
+
   return (
     <div className="w-full">
       {showFilters && (
@@ -146,7 +146,7 @@ const FightGrid = ({
                   <SelectValue placeholder="Weight Class" />
                 </SelectTrigger>
                 <SelectContent className="bg-black border-red-500/30">
-                  <SelectItem value="">All Weight Classes</SelectItem>
+                  <SelectItem value="all">All Weight Classes</SelectItem>
                   {weightClasses.map((wc) => (
                     <SelectItem key={wc} value={wc}>
                       {wc}
@@ -156,14 +156,14 @@ const FightGrid = ({
               </Select>
             </div>
           </div>
-          
+
           <div className="flex flex-wrap gap-2">
             <Button
               variant={showOnlyMainEvents ? "default" : "outline"}
               size="sm"
               onClick={() => setShowOnlyMainEvents(!showOnlyMainEvents)}
-              className={showOnlyMainEvents 
-                ? "bg-red-600 hover:bg-red-700 text-white" 
+              className={showOnlyMainEvents
+                ? "bg-red-600 hover:bg-red-700 text-white"
                 : "border-red-500/30 text-gray-300 hover:text-white hover:bg-red-950/30"
               }
             >
@@ -174,8 +174,8 @@ const FightGrid = ({
               variant={showOnlyTitleFights ? "default" : "outline"}
               size="sm"
               onClick={() => setShowOnlyTitleFights(!showOnlyTitleFights)}
-              className={showOnlyTitleFights 
-                ? "bg-red-600 hover:bg-red-700 text-white" 
+              className={showOnlyTitleFights
+                ? "bg-red-600 hover:bg-red-700 text-white"
                 : "border-red-500/30 text-gray-300 hover:text-white hover:bg-red-950/30"
               }
             >
@@ -185,7 +185,7 @@ const FightGrid = ({
           </div>
         </div>
       )}
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredFights.map((fight) => (
           <FightCard
@@ -203,7 +203,7 @@ const FightGrid = ({
           />
         ))}
       </div>
-      
+
       {filteredFights.length === 0 && (
         <div className="text-center py-10">
           <Search className="w-12 h-12 text-red-500/50 mx-auto mb-4" />

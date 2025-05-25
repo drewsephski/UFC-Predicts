@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Fighter } from '@/contexts/ufc-context';
+import type { Fighter } from '@/types/mma';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 
@@ -11,12 +11,12 @@ interface FighterStatsProps {
 
 export function FighterStats({ fighter }: FighterStatsProps) {
   // Calculate win percentages
-  const totalFights = fighter.wins + fighter.losses + fighter.draws;
-  const winPercentage = totalFights > 0 ? (fighter.wins / totalFights) * 100 : 0;
-  const koPercentage = fighter.wins > 0 ? (fighter.knockouts / fighter.wins) * 100 : 0;
-  const subPercentage = fighter.wins > 0 ? (fighter.submissions / fighter.wins) * 100 : 0;
-  const decisionPercentage = fighter.wins > 0 
-    ? ((fighter.wins - fighter.knockouts - fighter.submissions) / fighter.wins) * 100 
+  const totalFights = (fighter.Wins || 0) + (fighter.Losses || 0) + (fighter.Draws || 0);
+  const winPercentage = totalFights > 0 ? ((fighter.Wins || 0) / totalFights) * 100 : 0;
+  const koPercentage = (fighter.Wins || 0) > 0 ? ((fighter.TechnicalKnockouts || 0) / (fighter.Wins || 0)) * 100 : 0;
+  const subPercentage = (fighter.Wins || 0) > 0 ? ((fighter.Submissions || 0) / (fighter.Wins || 0)) * 100 : 0;
+  const decisionPercentage = (fighter.Wins || 0) > 0 
+    ? (((fighter.Wins || 0) - (fighter.TechnicalKnockouts || 0) - (fighter.Submissions || 0)) / (fighter.Wins || 0)) * 100 
     : 0;
 
   return (
@@ -39,7 +39,7 @@ export function FighterStats({ fighter }: FighterStatsProps) {
               <div>
                 <div className="flex justify-between mb-1">
                   <span className="text-sm text-muted-foreground">KO/TKO</span>
-                  <span className="text-sm font-medium">{koPercentage.toFixed(1)}%</span>
+                  <span className="text-sm font-medium">{(fighter.CareerStats?.KnockoutPercentage ?? 0).toFixed(1)}%</span>
                 </div>
                 <Progress value={koPercentage} className="h-2" indicatorClassName="bg-red-600" />
               </div>
@@ -47,17 +47,17 @@ export function FighterStats({ fighter }: FighterStatsProps) {
               <div>
                 <div className="flex justify-between mb-1">
                   <span className="text-sm text-muted-foreground">Submission</span>
-                  <span className="text-sm font-medium">{subPercentage.toFixed(1)}%</span>
+                  <span className="text-sm font-medium">{(fighter.CareerStats?.SubmissionAverage ?? 0).toFixed(1)}</span>
                 </div>
-                <Progress value={subPercentage} className="h-2" indicatorClassName="bg-blue-600" />
+                <Progress value={(fighter.CareerStats?.SubmissionAverage ?? 0) * 10} className="h-2" indicatorClassName="bg-blue-600" />
               </div>
               
               <div>
                 <div className="flex justify-between mb-1">
                   <span className="text-sm text-muted-foreground">Decision</span>
-                  <span className="text-sm font-medium">{decisionPercentage.toFixed(1)}%</span>
+                  <span className="text-sm font-medium">{(fighter.CareerStats?.DecisionPercentage ?? 0).toFixed(1)}%</span>
                 </div>
-                <Progress value={decisionPercentage} className="h-2" indicatorClassName="bg-yellow-600" />
+                <Progress value={(fighter.CareerStats?.DecisionPercentage ?? 0)} className="h-2" indicatorClassName="bg-yellow-600" />
               </div>
             </div>
           </div>
@@ -75,11 +75,11 @@ export function FighterStats({ fighter }: FighterStatsProps) {
                 <div className="flex justify-between mb-1">
                   <span className="text-sm text-muted-foreground">Striking Accuracy</span>
                   <span className="text-sm font-medium">
-                    {fighter.strikingAccuracy ? `${fighter.strikingAccuracy.toFixed(1)}%` : 'N/A'}
+                    {fighter.CareerStats?.SigStrikeAccuracy ? `${fighter.CareerStats.SigStrikeAccuracy.toFixed(1)}%` : 'N/A'}
                   </span>
                 </div>
                 <Progress 
-                  value={fighter.strikingAccuracy || 0} 
+                  value={fighter.CareerStats?.SigStrikeAccuracy || 0} 
                   className="h-2" 
                   indicatorClassName="bg-red-500" 
                 />
@@ -89,11 +89,11 @@ export function FighterStats({ fighter }: FighterStatsProps) {
                 <div className="flex justify-between mb-1">
                   <span className="text-sm text-muted-foreground">Takedown Accuracy</span>
                   <span className="text-sm font-medium">
-                    {fighter.takedownAccuracy ? `${fighter.takedownAccuracy.toFixed(1)}%` : 'N/A'}
+                    {fighter.CareerStats?.TakedownAverage ? `${fighter.CareerStats.TakedownAverage.toFixed(1)}` : 'N/A'}
                   </span>
                 </div>
                 <Progress 
-                  value={fighter.takedownAccuracy || 0} 
+                  value={(fighter.CareerStats?.TakedownAverage || 0) * 20}
                   className="h-2" 
                   indicatorClassName="bg-red-500" 
                 />
@@ -103,11 +103,11 @@ export function FighterStats({ fighter }: FighterStatsProps) {
                 <div className="flex justify-between mb-1">
                   <span className="text-sm text-muted-foreground">Strikes Landed Per Min</span>
                   <span className="text-sm font-medium">
-                    {fighter.strikesLandedPerMin?.toFixed(1) || 'N/A'}
+                    {fighter.CareerStats?.SigStrikesLandedPerMinute?.toFixed(1) || 'N/A'}
                   </span>
                 </div>
                 <Progress 
-                  value={fighter.strikesLandedPerMin ? (fighter.strikesLandedPerMin / 8) * 100 : 0} 
+                  value={fighter.CareerStats?.SigStrikesLandedPerMinute ? (fighter.CareerStats.SigStrikesLandedPerMinute / 10) * 100 : 0}
                   className="h-2" 
                   indicatorClassName="bg-red-500" 
                 />
@@ -119,11 +119,20 @@ export function FighterStats({ fighter }: FighterStatsProps) {
                 <div className="flex justify-between mb-1">
                   <span className="text-sm text-muted-foreground">Strikes Absorbed Per Min</span>
                   <span className="text-sm font-medium">
-                    {fighter.strikesAbsorbedPerMin?.toFixed(1) || 'N/A'}
+                    {'N/A'}
+                  </span>
+                </div>
+              </div>
+              
+              <div>
+                <div className="flex justify-between mb-1">
+                  <span className="text-sm text-muted-foreground">Takedown Average (per 15 min)</span>
+                  <span className="text-sm font-medium">
+                    {fighter.CareerStats?.TakedownAverage?.toFixed(1) || 'N/A'}
                   </span>
                 </div>
                 <Progress 
-                  value={fighter.strikesAbsorbedPerMin ? (fighter.strikesAbsorbedPerMin / 8) * 100 : 0} 
+                  value={(fighter.CareerStats?.TakedownAverage || 0) * 20}
                   className="h-2" 
                   indicatorClassName="bg-red-500" 
                 />
@@ -131,27 +140,13 @@ export function FighterStats({ fighter }: FighterStatsProps) {
               
               <div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-sm text-muted-foreground">Takedowns Per 15 Min</span>
+                  <span className="text-sm text-muted-foreground">Submission Average (per 15 min)</span>
                   <span className="text-sm font-medium">
-                    {fighter.avgTakedownsPer15Min?.toFixed(1) || 'N/A'}
+                    {fighter.CareerStats?.SubmissionAverage?.toFixed(1) || 'N/A'}
                   </span>
                 </div>
                 <Progress 
-                  value={fighter.avgTakedownsPer15Min ? (fighter.avgTakedownsPer15Min / 5) * 100 : 0} 
-                  className="h-2" 
-                  indicatorClassName="bg-red-500" 
-                />
-              </div>
-              
-              <div>
-                <div className="flex justify-between mb-1">
-                  <span className="text-sm text-muted-foreground">Submissions Per 15 Min</span>
-                  <span className="text-sm font-medium">
-                    {fighter.avgSubmissionsPer15Min?.toFixed(1) || 'N/A'}
-                  </span>
-                </div>
-                <Progress 
-                  value={fighter.avgSubmissionsPer15Min ? (fighter.avgSubmissionsPer15Min / 3) * 100 : 0} 
+                  value={(fighter.CareerStats?.SubmissionAverage || 0) * 20}
                   className="h-2" 
                   indicatorClassName="bg-red-500" 
                 />

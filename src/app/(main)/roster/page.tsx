@@ -3,7 +3,11 @@ import type { Fighter } from '@/types/mma'; // Import as type only
 
 async function fetchFighters(): Promise<Fighter[]> {
   try {
-    const response = await fetch('https://api.sportsdata.io/v3/mma/stats/json/Fighters?key=7fe7fb099e6a482e8c83febaa699e36d', {
+    const apiKey = process.env.SPORTSDATA_API_KEY;
+    if (!apiKey) {
+      throw new Error("SportsData API key is not configured.");
+    }
+    const response = await fetch(`https://api.sportsdata.io/v3/mma/stats/json/Fighters?key=${apiKey}`, {
       next: { revalidate: 3600 } // Revalidate data every hour
     });
     if (!response.ok) {

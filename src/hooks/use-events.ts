@@ -1,48 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
-
-interface Venue {
-  id: string;
-  name: string;
-  city: string;
-  state?: string;
-  country: string;
-}
-
-interface Fighter {
-  id: string;
-  name: string;
-  nickname?: string;
-  division: string;
-  record: string;
-  country?: string;
-  isChampion: boolean;
-  imageUrl?: string;
-}
-
-interface Fight {
-  id: string;
-  eventId: string;
-  fighter1Id: string;
-  fighter1: Fighter;
-  fighter2Id: string;
-  fighter2: Fighter;
-  weightClass: string;
-  isMainEvent: boolean;
-  isTitleFight: boolean;
-  order: number;
-}
-
-interface Event {
-  id: string;
-  name: string;
-  date: string;
-  venueId: string;
-  venue: Venue;
-  mainCard: Fight[];
-  prelimCard: Fight[];
-}
+import type { Event, Fight } from '@/contexts/ufc-context';
 
 interface UseEventsOptions {
   upcoming?: boolean;

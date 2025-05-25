@@ -3,6 +3,7 @@ import { cn, generateMetadata } from "@/functions";
 import { inter, satoshi } from "@/constants";
 import { Toaster } from "@/components/ui/sonner";
 import { Providers } from "@/components";
+import { RouteChangeHandler } from "@/components/ui/route-transition";
 
 export const metadata = generateMetadata();
 
@@ -26,6 +27,7 @@ export default function RootLayout({
                     position="top-right"
                 />
                 <Providers>
+                    <RouteChangeHandler />
                     {children}
                 </Providers>
             </body>

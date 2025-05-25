@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useUFC, type Fighter } from '@/contexts/ufc-context';
+import { useUFC } from '@/contexts/ufc-context';
+import type { Fighter } from '@/types/mma';
 import { Container } from '@/components';
 import { LoadingState, ErrorState } from '@/components/ui/loading-state';
 import { Input } from '@/components/ui/input';
@@ -30,7 +31,7 @@ const WEIGHT_DIVISIONS = [
 
 const FightersPage = () => {
   const { fighters, loadingFighters, errorFighters, refreshFighters } = useUFC();
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDivision, setSelectedDivision] = useState<string>('');
   const [showChampionsOnly, setShowChampionsOnly] = useState(false);
@@ -41,44 +42,44 @@ const FightersPage = () => {
   useEffect(() => {
     if (!loadingFighters && fighters.length > 0) {
       setIsFiltering(true);
-      
+
       // Apply filters
       let result = [...fighters];
-      
+
       // Filter by search query
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
-        result = result.filter(fighter => 
-          fighter.name.toLowerCase().includes(query) || 
+        result = result.filter(fighter =>
+          fighter.name.toLowerCase().includes(query) ||
           fighter.nickname?.toLowerCase().includes(query)
         );
       }
-      
+
       // Filter by division
       if (selectedDivision) {
         result = result.filter(fighter => fighter.division === selectedDivision);
       }
-      
+
       // Filter champions only
       if (showChampionsOnly) {
         result = result.filter(fighter => fighter.isChampion);
       }
-      
+
       // Sort by ranking and champion status
       result.sort((a, b) => {
         // Champions first
         if (a.isChampion && !b.isChampion) return -1;
         if (!a.isChampion && b.isChampion) return 1;
-        
+
         // Then by ranking
         if (a.ranking && b.ranking) return a.ranking - b.ranking;
         if (a.ranking && !b.ranking) return -1;
         if (!a.ranking && b.ranking) return 1;
-        
+
         // Then alphabetically
-        return a.name.localeCompare(b.name);
+        return (a.name || '').localeCompare(b.name || '');
       });
-      
+
       setFilteredFighters(result);
       setIsFiltering(false);
     }
@@ -107,7 +108,7 @@ const FightersPage = () => {
             Browse and search for UFC fighters across all weight divisions
           </p>
         </div>
-        
+
         {/* Filters */}
         <div className="bg-black/70 border border-red-500/30 rounded-lg p-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -124,7 +125,7 @@ const FightersPage = () => {
                 />
               </div>
             </div>
-            
+
             <div>
               <Label htmlFor="division" className="mb-2 block">Weight Division</Label>
               <Select value={selectedDivision} onValueChange={setSelectedDivision}>
@@ -141,7 +142,7 @@ const FightersPage = () => {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div className="flex flex-col">
               <Label className="mb-2 block">Options</Label>
               <div className="flex items-center h-10">
@@ -152,7 +153,7 @@ const FightersPage = () => {
                 >
                   Champions Only
                 </Button>
-                
+
                 <Button
                   variant="ghost"
                   onClick={clearFilters}
@@ -165,7 +166,7 @@ const FightersPage = () => {
             </div>
           </div>
         </div>
-        
+
         {/* Results */}
         <div>
           <div className="flex justify-between items-center mb-4">
@@ -185,7 +186,7 @@ const FightersPage = () => {
               )}
             </div>
           </div>
-          
+
           {isFiltering ? (
             <LoadingState text="Filtering fighters..." />
           ) : filteredFighters.length === 0 ? (
@@ -204,37 +205,40 @@ const FightersPage = () => {
               {filteredFighters.map((f) => {
                 const [firstName, ...lastNameParts] = f.name.split(' ');
                 const lastName = lastNameParts.join(' ');
-                const recordParts = f.record.split('-').map(Number);
+                const recordParts = (f.record || '0-0-0').split('-').map(Number);
 
                 const fighterForCard: import('@/types/mma').Fighter = {
-                  FighterId: Number.parseInt(f.id, 10),
-                  FirstName: firstName || null,
-                  LastName: lastName,
-                  Nickname: f.nickname ?? null,
-                  WeightClass: f.division,
-                  Wins: recordParts[0] || 0,
-                  Losses: recordParts[1] || 0,
-                  Draws: recordParts[2] || 0,
+                  id: f.id.toString(),
+                  name: f.name,
+                  division: f.division,
+                  wins: recordParts[0] || 0,
+                  losses: recordParts[1] || 0,
+                  draws: recordParts[2] || 0,
                   // --- Fields from @/types/mma that are not directly in FightersPage's fighter structure ---
                   // These would ideally come from the context or be fetched, setting to null/defaults for now
-                  BirthDate: null, // Or map f.country here if that was the intent in FighterCard
-                  Height: null, // Or map f.imageUrl if that was the intent
-                  Weight: null,
-                  Reach: null,
-                  NoContests: null,
-                  TechnicalKnockouts: f.knockouts || null,
-                  TechnicalKnockoutLosses: null,
-                  Submissions: f.submissions || null,
-                  SubmissionLosses: null,
-                  TitleWins: f.isChampion ? 1 : 0, // Simplified mapping for champion status
-                  TitleLosses: null,
-                  TitleDraws: null,
-                  CareerStats: null, // This is a big one, ideally fetched or part of the context data
+                  birthDate: f.country || null, // Or map f.country here if that was the intent in FighterCard
+                  height: null, // Or map f.imageUrl if that was the intent
+                  weight: null,
+                  reach: null,
+                  noContests: null,
+                  technicalKnockouts: f.technicalKnockouts || null,
+                  technicalKnockoutLosses: f.technicalKnockoutLosses || null,
+                  submissions: f.submissions || null,
+                  submissionLosses: null,
+                  titleWins: f.isChampion ? 1 : 0, // Simplified mapping for champion status
+                  titleLosses: null,
+                  titleDraws: null,
+                  careerStats: null,
+                  nickname: f.nickname || null,
+                  imageUrl: f.imageUrl || null,
+                  country: f.country || null,
+                  isChampion: f.isChampion,
+                  record: f.record || ''
                 };
 
                 return (
-                  <FighterCard 
-                    key={f.id} 
+                  <FighterCard
+ key={`fighter-${f.id.toString()}`}
                     fighter={fighterForCard}
                   />
                 );

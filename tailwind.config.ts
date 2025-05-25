@@ -1,9 +1,9 @@
-
 import type { Config } from "tailwindcss"
 // @ts-ignore
 import svgToDataUri from "mini-svg-data-uri";
 import colors from "tailwindcss/colors";
 import flattenColorPalette from "tailwindcss/lib/util/flattenColorPalette";
+import plugin from 'tailwindcss/plugin';
 
 const config = {
   darkMode: "class",
@@ -157,7 +157,7 @@ const config = {
     addVariablesForColors,
     require("tailwindcss-animate"),
     require("tailwind-scrollbar-hide"),
-    ({ matchUtilities, theme }: { matchUtilities: any, theme: any }) => {
+    plugin(({ matchUtilities, theme }) => {
       matchUtilities(
         {
           "bg-grid": (value: string) => ({
@@ -178,16 +178,15 @@ const config = {
         },
         { values: flattenColorPalette(theme("backgroundColor")), type: "color" }
       );
-    },
+    }),
   ],
 } satisfies Config;
 
-type AddBaseProps = {
-  addBase: (base: Record<string, any>) => void;
-  theme: (path: string) => Record<string, string>;
-};
-
-function addVariablesForColors({ addBase, theme }: AddBaseProps) {
+function addVariablesForColors({
+  addBase,
+  theme
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+}: { addBase: (styles: object) => void; theme: (key: string) => Record<string, any> }) {
   const allColors = flattenColorPalette(theme("colors"));
   const newVars = Object.fromEntries(
     Object.entries(allColors).map(([key, val]) => [`--${key}`, val])

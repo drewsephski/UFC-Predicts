@@ -2,11 +2,14 @@ import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
 import { BlurText } from "../ui/blur-text";
 import { Button } from "../ui/button";
-import { motion } from "framer-motion";
 import Image from "next/image";
 import Container from "../global/container";
 
-const Hero = () => {
+interface HeroProps {
+  onGetStarted?: () => void;
+}
+
+const Hero = ({ onGetStarted }: HeroProps) => {
     return (
         <div className="flex flex-col items-center text-center w-full max-w-5xl my-24 mx-auto z-40 relative">
             <Container delay={0.0}>
@@ -37,11 +40,16 @@ const Hero = () => {
             </Container>
             <Container delay={0.2}>
                 <div className="flex items-center justify-center md:gap-x-6 mt-8">
-                        <Button asChild size="lg" className="bg-red-600 hover:bg-red-700 text-white">
-                        <Link href="/app">
-                            View Predictions
-                        </Link>
-                    </Button>
+                        <Button
+                          asChild
+                          size="lg"
+                          className="bg-red-600 hover:bg-red-700 text-white"
+                          onClick={onGetStarted}
+                        >
+                          <Link href="#features">
+                            Get Started
+                          </Link>
+                        </Button>
                     <Button asChild size="lg" variant="outline" className="hidden md:flex border-red-500/50 hover:bg-red-500/10 text-red-500 hover:text-red-400">
                         <Link href="/compare">
                             Compare Fighters

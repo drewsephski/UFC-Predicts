@@ -1,11 +1,33 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useUFC, Fight } from '@/contexts/ufc-context';
+import { useUFC } from '@/contexts/ufc-context';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LoadingState, ErrorState } from '@/components/ui/loading-state';
 import { Calendar, Clock, Trophy } from 'lucide-react';
+
+// Local Fight type based on the current /api/fighters/:id/fights endpoint response
+interface Fight {
+  id: string;
+  eventId: string;
+  redCornerId: string;
+  blueCornerId: string;
+  weightClass: string;
+  isMainEvent: boolean;
+  isTitleFight: boolean;
+  rounds: number;
+  date: string;
+  status: 'scheduled' | 'completed' | 'cancelled';
+  result?: {
+    winnerId?: string;
+    method?: string;
+    round?: number;
+    time?: string;
+  };
+  redCorner?: { name: string }; // Assuming only name is needed
+  blueCorner?: { name: string }; // Assuming only name is needed
+}
 
 interface FighterFightHistoryProps {
   fighterId: string;
@@ -21,11 +43,11 @@ export function FighterFightHistory({ fighterId }: FighterFightHistoryProps) {
     const fetchFighterHistory = async () => {
       setIsLoading(true);
       setError(null);
-      
+
       try {
         const response = await fetch(`/api/fighters/${fighterId}/fights`);
         if (!response.ok) throw new Error('Failed to fetch fighter history');
-        
+
         const data = await response.json();
         setFights(data);
       } catch (err) {
@@ -34,7 +56,7 @@ export function FighterFightHistory({ fighterId }: FighterFightHistoryProps) {
         setIsLoading(false);
       }
     };
-    
+
     fetchFighterHistory();
   }, [fighterId]);
 
@@ -65,7 +87,7 @@ export function FighterFightHistory({ fighterId }: FighterFightHistoryProps) {
         const opponent = isFighterRedCorner ? fight.blueCorner : fight.redCorner;
         const isWinner = fight.result?.winnerId === fighterId;
         const isLoser = fight.result?.winnerId && fight.result.winnerId !== fighterId;
-        
+
         return (
           <Card key={fight.id} className="bg-black/70 border-red-500/30 overflow-hidden">
             <div className={`h-1 w-full ${isWinner ? 'bg-green-500' : isLoser ? 'bg-red-500' : 'bg-gray-500'}`} />
@@ -84,7 +106,7 @@ export function FighterFightHistory({ fighterId }: FighterFightHistoryProps) {
                     })}
                   </div>
                 </div>
-                
+
                 <div className="flex flex-wrap gap-2 mt-2 md:mt-0">
                   {fight.isTitleFight && (
                     <Badge className="bg-yellow-500 text-black">
@@ -101,7 +123,7 @@ export function FighterFightHistory({ fighterId }: FighterFightHistoryProps) {
                   )}
                 </div>
               </div>
-              
+
               {fight.result && (
                 <div className="mt-4 pt-4 border-t border-red-500/10">
                   <div className="flex flex-col md:flex-row md:items-center justify-between">
@@ -115,7 +137,7 @@ export function FighterFightHistory({ fighterId }: FighterFightHistoryProps) {
                         </span>
                       )}
                     </div>
-                    
+
                     {(fight.result.round || fight.result.time) && (
                       <div className="flex items-center mt-2 md:mt-0 text-sm text-muted-foreground">
                         <Clock className="w-4 h-4 mr-1" />

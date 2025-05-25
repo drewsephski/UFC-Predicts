@@ -158,7 +158,7 @@ const SignUpForm = () => {
             >
                 <div className="flex justify-center">
                     <Link href="/">
-                        {Icons.icon && Icons.icon({ className: "w-8 h-8" })}
+                        {Icons.icon?.({ className: "w-8 h-8" })}
                     </Link>
                 </div>
                 <h1 className="text-2xl text-center mt-4">
@@ -194,7 +194,7 @@ const SignUpForm = () => {
                             >
                                 {isGoogleLoading ? 
                                   <LoadingIcon size="sm" className="w-4 h-4 absolute left-4" /> : 
-                                  Icons.google && Icons.google({ className: "w-4 h-4 absolute left-4" })}
+                                  Icons.google?.({ className: "w-4 h-4 absolute left-4" })}
                                 Continue with Google
                             </Button>
                         </div>
@@ -209,7 +209,7 @@ const SignUpForm = () => {
                             >
                                 {isAppleLoading ? 
                                   <LoadingIcon size="sm" className="w-4 h-4 absolute left-4" /> : 
-                                  Icons.apple && Icons.apple({ className: "w-4 h-4 absolute left-4" })}
+                                  Icons.apple?.({ className: "w-4 h-4 absolute left-4" })}
                                 Continue with Apple
                             </Button>
                         </div>

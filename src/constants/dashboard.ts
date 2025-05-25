@@ -19,35 +19,62 @@ export const ACTIVITIES = [
     { id: 3, text: 'Facebook engagement up by 23%', time: '6 hours ago' },
 ];
 
-export const RECENT_SALES = [
-    {
-        name: "Olivia Martin",
-        email: "olivia.martin@email.com",
-        amount: "+$1,999.00"
-    },
-    {
-        name: "Jackson Lee",
-        email: "jackson.lee@email.com",
-        amount: "+$39.00"
-    },
-    {
-        name: "Isabella Nguyen",
-        email: "isabella.nguyen@email.com",
-        amount: "+$299.00"
-    },
-    {
-        name: "William Kim",
-        email: "will@email.com",
-        amount: "+$99.00"
-    },
-    {
-        name: "Sofia Davis",
-        email: "sofia.davis@email.com",
-        amount: "+$39.00"
-    },
-    {
-        name: "Ethan Thompson",
-        email: "ethan.thompson@email.com",
-        amount: "+$199.00"
-    }
+interface RecentSale {
+  id: string;
+  name: string;
+  email: string;
+  amount: string;
+  avatarUrl?: string;
+  status: 'completed' | 'pending' | 'failed';
+}
+
+export const RECENT_SALES: RecentSale[] = [
+  {
+    id: '1',
+    name: 'Olivia Martin',
+    email: 'olivia.martin@email.com',
+    amount: '+$1,999.00',
+    avatarUrl: 'https://randomuser.me/api/portraits/women/1.jpg',
+    status: 'completed',
+  },
+  {
+    id: '2',
+    name: 'Jackson Lee',
+    email: 'jackson.lee@email.com',
+    amount: '+$39.00',
+    avatarUrl: 'https://randomuser.me/api/portraits/men/1.jpg',
+    status: 'completed',
+  },
+  {
+    id: '3',
+    name: 'Isabella Nguyen',
+    email: 'isabella.nguyen@email.com',
+    amount: '+$299.00',
+    avatarUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
+    status: 'pending',
+  },
+  {
+    id: '4',
+    name: 'William Kim',
+    email: 'will@email.com',
+    amount: '+$99.00',
+    avatarUrl: 'https://randomuser.me/api/portraits/men/2.jpg',
+    status: 'completed',
+  },
+  {
+    id: '5',
+    name: 'Sofia Davis',
+    email: 'sofia.davis@email.com',
+    amount: '+$39.00',
+    avatarUrl: 'https://randomuser.me/api/portraits/women/3.jpg',
+    status: 'failed',
+  },
+  {
+    id: '6',
+    name: 'Ethan Thompson',
+    email: 'ethan.thompson@email.com',
+    amount: '+$199.00',
+    avatarUrl: 'https://randomuser.me/api/portraits/men/3.jpg',
+    status: 'completed',
+  }
 ];

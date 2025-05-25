@@ -1,26 +1,80 @@
-"use client";
-
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+'use client';
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { useUFC, type Fighter, type Fight } from '@/contexts/ufc-context';
-import { LoadingState, ErrorState } from '@/components/ui/loading-state';
+import Image from 'next/image';
+import { useState, useEffect } from 'react';
+import { BarChart3, Calendar, Flag, Ruler, Scale, Trophy, User } from 'lucide-react';
+
+import { getFighters, getUpcomingFights } from '@/lib/api/ufc';
+import type { Fighter } from '@/types/mma';
+import type { Fight } from '@/contexts/ufc-context';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Container } from '@/components';
-import { BarChart3, Calendar, Flag, Ruler, Scale, Trophy, User } from 'lucide-react';
-import Image from 'next/image';
+import { LoadingState, ErrorState } from '@/components/ui/loading-state';
+import { useUFC } from '@/contexts/ufc-context';
+import { useParams, useRouter } from 'next/navigation';
 import { FighterPredictionForm } from '@/components/fighters/fighter-prediction-form';
 import { FighterStats } from '@/components/fighters/fighter-stats';
 import { FighterFightHistory } from '@/components/fighters/fighter-fight-history';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { PaginationNav } from '@/components/ui/pagination-nav';
 
-const FighterDetailPage = () => {
-  const params = useParams();
-  const fighterId = params.id;
+// Types
+type PageProps = {
+  params: { id: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
+};
+
+// Generate static params for static generation
+export async function generateStaticParams() {
+  // In a real app, you might fetch all fighter IDs here
+  // For now, we'll rely on on-demand generation
+  return [];
+}
+
+// Get navigation fighters (previous/next in the same division)
+function getNavigationFighters(fighters: Fighter[], currentFighter: Fighter) {
+  const divisionFighters = fighters
+    .filter((f: Fighter) => f.division === currentFighter.division)
+    .sort((a: Fighter, b: Fighter) => (a.ranking || 0) - (b.ranking || 0) || a.name.localeCompare(b.name));
+
+  const currentIndex = divisionFighters.findIndex((f: Fighter) => f.id === currentFighter.id);
+
+  return {
+    prev: divisionFighters[currentIndex - 1] || null,
+    next: divisionFighters[currentIndex + 1] || null,
+  };
+}
+
+// Format record string
+const formatRecord = (wins: number, losses: number, draws: number): string => {
+  return `${wins}-${losses}${draws > 0 ? `-${draws}` : ''}`;
+};
+
+// Format height from inches to feet and inches
+const formatHeight = (heightInInches: number | null): string => {
+  if (!heightInInches) return 'N/A';
+  const feet = Math.floor(heightInInches / 12);
+  const inches = heightInInches % 12;
+  return `${feet}'${inches}"`;
+};
+
+// Format weight from pounds to weight class
+const formatWeight = (weightInPounds: number | null): string => {
+  if (!weightInPounds) return 'N/A';
+  return `${weightInPounds} lbs`;
+};
+
+export default function FighterDetailPage({ params }: PageProps) {
+  const router = useRouter();
+  const fighterId = params.id as string; // Type assertion for TypeScript
+
+  // Handle case where fighterId is an array (shouldn't happen with proper routing)
+  const normalizedFighterId = Array.isArray(fighterId) ? fighterId[0] : fighterId;
 
   const {
     fighters,
@@ -41,7 +95,14 @@ const FighterDetailPage = () => {
 
   useEffect(() => {
     if (!loadingFighters && fighters.length > 0) {
-      const foundFighter = fighters.find(f => f.id === fighterId);
+      const foundFighter = fighters.find(f => f.id.toString() === normalizedFighterId);
+
+      // If fighter not found, redirect to 404 or fighters list
+      if (!foundFighter) {
+        router.replace('/fighters');
+        return;
+      }
+
       if (foundFighter) {
         setFighter(foundFighter);
 
@@ -56,7 +117,7 @@ const FighterDetailPage = () => {
             return a.name.localeCompare(b.name);
           });
 
-        const currentIndex = divisionFighters.findIndex(f => f.id === fighterId);
+        const currentIndex = divisionFighters.findIndex(f => f.id.toString() === fighterId);
 
         if (currentIndex > 0) {
           setPrevFighter(divisionFighters[currentIndex - 1] || null);
@@ -77,15 +138,14 @@ const FighterDetailPage = () => {
     if (!loadingFighters && !loadingFights) {
       setIsLoading(false);
     }
-  }, [fighterId, fighters, loadingFighters, errorFighters, loadingFights]);
+  }, [fighterId, fighters, loadingFighters, errorFighters, loadingFights, normalizedFighterId, router]);
 
   useEffect(() => {
     if (!loadingFights && upcomingFights.length > 0 && fighter) {
       // Find if this fighter has an upcoming fight
       const nextFight = upcomingFights.find(
-        fight =>
-          fight.redCornerId === fighter.id ||
-          fight.blueCornerId === fighter.id
+ fight => fight.redCornerId.toString() === fighter.id.toString() ||
+ fight.blueCornerId.toString() === fighter.id.toString()
       );
 
       if (nextFight) {
@@ -231,15 +291,15 @@ const FighterDetailPage = () => {
                 <h3 className="font-semibold mb-2">Upcoming Fight</h3>
                 <p className="text-sm text-muted-foreground mb-1">
                   {new Date(upcomingFight.date).toLocaleDateString('en-US', {
-                    year: 'numeric',
+ year: 'numeric',
                     month: 'long',
                     day: 'numeric'
                   })}
                 </p>
                 <p className="text-sm mb-3">
                   vs. {
-                    upcomingFight.redCornerId === fighter.id
-                      ? upcomingFight.blueCorner?.name || 'Opponent'
+ upcomingFight.redCornerId.toString() === fighter.id.toString()
+ ? upcomingFight.blueCorner?.name || 'Opponent'
                       : upcomingFight.redCorner?.name || 'Opponent'
                   }
                 </p>
@@ -265,7 +325,7 @@ const FighterDetailPage = () => {
             </TabsContent>
 
             <TabsContent value="history" className="mt-4">
-              <FighterFightHistory fighterId={fighter.id} />
+ <FighterFightHistory fighterId={fighterId as string} />
             </TabsContent>
 
             <TabsContent value="predict" className="mt-4">
@@ -329,4 +389,3 @@ const FighterDetailPage = () => {
   );
 };
 
-export default FighterDetailPage;

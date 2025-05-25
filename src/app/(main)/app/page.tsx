@@ -1,20 +1,24 @@
-"use client"
-
-import React from 'react'
-import { ArrowDownIcon, ArrowUpIcon, BarChart3Icon, MessageSquareIcon, Share2Icon, UsersIcon } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
-import { ANALYTICS_DATA, RECENT_SALES } from "@/constants/dashboard";
-
-import type {
-    ChartConfig,
-} from "@/components/ui/chart"
+import React from 'react';
 import {
-    ChartContainer,
-    ChartTooltip,
-    ChartTooltipContent,
-} from "@/components/ui/chart"
-import { Container } from "@/components";
+  ArrowDownIcon,
+  ArrowUpIcon,
+  BarChart3Icon,
+  CheckCircle2,
+  Clock,
+  MessageSquareIcon,
+  Share2Icon,
+  UsersIcon,
+  XCircle
+} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
+import { ANALYTICS_DATA, RECENT_SALES } from '@/constants/dashboard';
+import { getSafeImageUrl } from '@/lib/utils/images';
+import { ImageWithFallback } from '@/components/ui/image-with-fallback';
+import { cn } from '@/functions';
+import type { ChartConfig } from '@/components/ui/chart';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { Container } from '@/components';
 
 const chartConfig = {
     reach: {
@@ -181,15 +185,53 @@ export default function Page() {
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-8">
-                                    {RECENT_SALES.map((sale) => (
-                                        <div key={sale.email} className="flex items-center">
-                                            <div className="space-y-1">
-                                                <p className="text-sm font-medium leading-none">{sale.name}</p>
-                                                <p className="text-sm text-muted-foreground">{sale.email}</p>
+                                    {RECENT_SALES.map((sale) => {
+                                        const StatusIcon = {
+                                            completed: CheckCircle2,
+                                            pending: Clock,
+                                            failed: XCircle,
+                                        }[sale.status];
+                                        
+                                        const statusColor = {
+                                            completed: 'text-green-500',
+                                            pending: 'text-amber-500',
+                                            failed: 'text-destructive',
+                                        }[sale.status];
+
+                                        return (
+                                            <div key={sale.id} className="flex items-center hover:bg-muted/50 p-2 rounded-lg transition-colors">
+                                                <div className="relative h-10 w-10 rounded-full overflow-hidden mr-3">
+                                                    <ImageWithFallback
+                                                        src={sale.avatarUrl || undefined}
+                                                        alt={sale.name}
+                                                        width={40}
+                                                        height={40}
+                                                        className="rounded-full object-cover"
+                                                        fallback={getSafeImageUrl(sale.avatarUrl, 'user')}
+                                                    />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center justify-between">
+                                                        <p className="text-sm font-medium leading-none truncate">
+                                                            {sale.name}
+                                                        </p>
+                                                        <div className="ml-2 flex items-center">
+                                                            <StatusIcon className={cn('h-3.5 w-3.5 mr-1', statusColor)} />
+                                                            <span className={cn('text-xs font-medium', statusColor)}>
+                                                                {sale.status.charAt(0).toUpperCase() + sale.status.slice(1)}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <p className="text-sm text-muted-foreground truncate">
+                                                        {sale.email}
+                                                    </p>
+                                                </div>
+                                                <div className="ml-4 font-medium whitespace-nowrap">
+                                                    {sale.amount}
+                                                </div>
                                             </div>
-                                            <div className="ml-auto font-medium">{sale.amount}</div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </CardContent>
                         </Card>

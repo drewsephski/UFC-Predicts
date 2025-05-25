@@ -6,7 +6,7 @@ const AuthCallbackPage = async () => {
 
     const user = await currentUser();
 
-    if (!user?.id || !user.emailAddresses[0].emailAddress) {
+    if (!user?.id || !user?.emailAddresses?.[0]?.emailAddress) {
         return redirect("/auth/signin");
     }
 

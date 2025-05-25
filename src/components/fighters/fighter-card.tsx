@@ -37,7 +37,7 @@ export const FighterCard = ({
       if (success) {
         setIsFavorite(false);
         setLocalFavoriteId(undefined);
-        toast.success(`${fighter.FirstName} ${fighter.LastName} removed from favorites`);
+        toast.success(`${fighter.firstName} ${fighter.lastName} removed from favorites`);
       } else {
         toast.error("Failed to remove from favorites");
       }
@@ -48,7 +48,7 @@ export const FighterCard = ({
         // Note: In a real app, we would get the new favorite ID from the result
         // For simplicity, we're just setting it to true here
         setLocalFavoriteId("temp-id");
-        toast.success(`${fighter.FirstName} ${fighter.LastName} added to favorites`);
+        toast.success(`${fighter.firstName} ${fighter.lastName} added to favorites`);
       } else {
         toast.error("Failed to add to favorites");
       }

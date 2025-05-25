@@ -173,11 +173,15 @@ export function FightPredictionForm({ fight }: FightPredictionFormProps) {
                 <SelectValue placeholder="Select round" />
               </SelectTrigger>
               <SelectContent>
-                {[...Array(fight.rounds)].map((_, i) => (
-                  <SelectItem key={`round-${i + 1}`} value={(i + 1).toString()}>
-                    Round {i + 1}
-                  </SelectItem>
-                ))}
+                {[...Array(fight.rounds)].map((_, i) => {
+                  const roundValue = (i + 1).toString();
+                  if (roundValue === '') return null;
+                  return (
+                    <SelectItem key={`round-${i + 1}`} value={roundValue}>
+                      Round {i + 1}
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
           </div>

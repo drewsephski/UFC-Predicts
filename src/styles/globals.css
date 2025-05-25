@@ -37,8 +37,8 @@
     --primary-foreground: 0 0% 93%;
     --primary-light: 0 84% 66%;
     --primary-light-foreground: 0 83% 75%;
-    --secondary: 256 42% 25%;
-    --secondary-foreground: 249 94% 93%;
+    --secondary: 0 60% 35%;
+    --secondary-foreground: 0 100% 85%;
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
     --accent: 240 3.7% 15.9%;
@@ -228,7 +228,7 @@ img {
 :root {
   --content-background: #100F1B;
   --spot-light-size: 800px;
-  --spot-light-color: rgba(139, 92, 246, 0.15);
+  --spot-light-color: rgba(255, 0, 0, 0.15);
   --card-border-color: rgba(255, 255, 255, 0.4);
 }
 
