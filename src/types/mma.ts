@@ -45,12 +45,12 @@ export interface Fighter {
 
 export interface Fight {
   id: string;
-  eventName: string;
+  eventName?: string;
   date: string;
   redCornerId: string;
   blueCornerId: string;
-  redCornerName: string;
-  blueCornerName: string;
+  redCornerName?: string;
+  blueCornerName?: string;
   weightClass: string;
   isTitleFight: boolean;
   result?: {

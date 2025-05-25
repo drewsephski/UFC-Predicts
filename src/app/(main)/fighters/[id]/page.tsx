@@ -135,13 +135,27 @@ const FighterDetailPage: FC<PageProps> = ({ params }) => {
     if (!loadingFights && upcomingFights.length > 0 && fighter) {
       // Find if this fighter has an upcoming fight
       const nextFight = upcomingFights.find(
- fight => fight.redCornerId.toString() === fighter.id.toString() ||
- fight.blueCornerId.toString() === fighter.id.toString()
+        fight => fight.redCornerId.toString() === fighter.id.toString() ||
+                fight.blueCornerId.toString() === fighter.id.toString()
       );
 
       if (nextFight) {
-        setUpcomingFight(nextFight);
+        // Ensure we have all required properties with defaults
+        const fightWithDefaults: Fight = {
+          ...nextFight,
+          eventName: nextFight.eventName || 'Upcoming Event',
+          redCornerName: nextFight.redCornerName || 'Fighter',
+          blueCornerName: nextFight.blueCornerName || 'Opponent',
+          weightClass: nextFight.weightClass || fighter.division || 'Unknown',
+          isTitleFight: nextFight.isTitleFight || false,
+          result: nextFight.result
+        };
+        setUpcomingFight(fightWithDefaults);
+      } else {
+        setUpcomingFight(null);
       }
+    } else {
+      setUpcomingFight(null);
     }
   }, [fighter, upcomingFights, loadingFights]);
 
