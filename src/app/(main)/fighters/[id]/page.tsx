@@ -1,10 +1,9 @@
 'use client';
-import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import Link from 'next/link';
-import Image from 'next/image';
+import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { BarChart3, Calendar, Flag, Ruler, Scale, Trophy, User } from 'lucide-react';
+import Link from 'next/link';
+import Image from 'next/image';
 
 import { getFighters, getUpcomingFights } from '@/lib/api/ufc';
 import type { Fighter } from '@/types/mma';
@@ -16,7 +15,6 @@ import { Badge } from '@/components/ui/badge';
 import { Container } from '@/components';
 import { LoadingState, ErrorState } from '@/components/ui/loading-state';
 import { useUFC } from '@/contexts/ufc-context';
-import { useParams, useRouter } from 'next/navigation';
 import { FighterPredictionForm } from '@/components/fighters/fighter-prediction-form';
 import { FighterStats } from '@/components/fighters/fighter-stats';
 import { FighterFightHistory } from '@/components/fighters/fighter-fight-history';
@@ -28,13 +26,6 @@ type PageProps = {
   params: { id: string };
   searchParams?: { [key: string]: string | string[] | undefined };
 };
-
-// Generate static params for static generation
-export async function generateStaticParams() {
-  // In a real app, you might fetch all fighter IDs here
-  // For now, we'll rely on on-demand generation
-  return [];
-}
 
 // Get navigation fighters (previous/next in the same division)
 function getNavigationFighters(fighters: Fighter[], currentFighter: Fighter) {
