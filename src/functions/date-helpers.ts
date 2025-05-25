@@ -1,15 +1,16 @@
 import { parseISO } from 'date-fns/parseISO';
 import { differenceInYears } from 'date-fns/differenceInYears';
 
-export const calculateAge = (dateString: string): number | string => {
+// In date-helpers.ts
+export const calculateAge = (dateString: string): number | null => {
   try {
     const date = parseISO(dateString);
     if (Number.isNaN(date.getTime())) {
-      return 'N/A';
+      return null;
     }
     return differenceInYears(new Date(), date);
   } catch (error) {
     console.error("Error calculating age:", error);
-    return 'N/A';
+    return null;
   }
-}; 
+};

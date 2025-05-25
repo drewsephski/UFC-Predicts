@@ -2,7 +2,7 @@
 
 import type React from 'react';
 import { useState } from 'react';
-import { useUFC, type Fighter, type Fight } from '@/contexts/ufc-context';
+import { useUFC, type Fight } from '@/contexts/ufc-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { LoadingState } from '@/components/ui/loading-state';
 import { useAuth } from '@clerk/nextjs';
+import { Fighter } from '@/types/mma';
 
 interface FighterPredictionFormProps {
   fighter: Fighter;
@@ -23,7 +24,7 @@ export function FighterPredictionForm({ fighter, upcomingFight }: FighterPredict
   const router = useRouter();
   const { isSignedIn } = useAuth();
   const { makePrediction, loadingPredictions } = useUFC();
-  
+
   const [method, setMethod] = useState<string>('decision');
   const [round, setRound] = useState<number | undefined>(undefined);
   const [confidence, setConfidence] = useState<number>(70);
@@ -32,20 +33,20 @@ export function FighterPredictionForm({ fighter, upcomingFight }: FighterPredict
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!isSignedIn) {
       toast.error('You must be signed in to make predictions');
       router.push('/auth/signin');
       return;
     }
-    
+
     if (!upcomingFight) {
       toast.error('No upcoming fight found for this fighter');
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
       const predictionData = {
         fightId: upcomingFight.id,
@@ -55,9 +56,9 @@ export function FighterPredictionForm({ fighter, upcomingFight }: FighterPredict
         confidence,
         notes: notes.trim() || undefined,
       };
-      
+
       const result = await makePrediction(predictionData);
-      
+
       if (result) {
         toast.success('Prediction saved successfully!');
         setMethod('decision');
@@ -85,7 +86,7 @@ export function FighterPredictionForm({ fighter, upcomingFight }: FighterPredict
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button 
+          <Button
             onClick={() => router.push('/auth/signin')}
             className="w-full bg-red-600 hover:bg-red-700 text-white"
           >
@@ -118,8 +119,8 @@ export function FighterPredictionForm({ fighter, upcomingFight }: FighterPredict
     return <LoadingState text="Saving prediction..." />;
   }
 
-  const opponent = upcomingFight.redCornerId === fighter.id 
-    ? upcomingFight.blueCorner 
+  const opponent = upcomingFight.redCornerId === fighter.id
+    ? upcomingFight.blueCorner
     : upcomingFight.redCorner;
 
   return (
@@ -147,12 +148,12 @@ export function FighterPredictionForm({ fighter, upcomingFight }: FighterPredict
               </SelectContent>
             </Select>
           </div>
-          
+
           {method !== 'decision' && (
             <div className="space-y-2">
               <Label htmlFor="round">Round</Label>
-              <Select 
-                value={round?.toString() || ''} 
+              <Select
+                value={round?.toString() || ''}
                 onValueChange={(value) => setRound(value ? Number.parseInt(value) : undefined)}
               >
                 <SelectTrigger id="round">
@@ -172,7 +173,7 @@ export function FighterPredictionForm({ fighter, upcomingFight }: FighterPredict
               </Select>
             </div>
           )}
-          
+
           <div className="space-y-2">
             <div className="flex justify-between">
               <Label htmlFor="confidence">Confidence ({confidence}%)</Label>
@@ -197,7 +198,7 @@ export function FighterPredictionForm({ fighter, upcomingFight }: FighterPredict
               <span>High</span>
             </div>
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="notes">Notes (Optional)</Label>
             <Textarea
@@ -208,9 +209,9 @@ export function FighterPredictionForm({ fighter, upcomingFight }: FighterPredict
               className="min-h-[100px]"
             />
           </div>
-          
-          <Button 
-            type="submit" 
+
+          <Button
+            type="submit"
             className="w-full bg-red-600 hover:bg-red-700 text-white"
           >
             Submit Prediction

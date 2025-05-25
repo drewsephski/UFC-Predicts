@@ -148,7 +148,12 @@ const FighterDetailPage: FC<PageProps> = ({ params }) => {
           blueCornerName: nextFight.blueCornerName || 'Opponent',
           weightClass: nextFight.weightClass || fighter.division || 'Unknown',
           isTitleFight: nextFight.isTitleFight || false,
-          result: nextFight.result
+          result: nextFight.result || {
+            winnerId: null,
+            method: null,
+            round: null,
+            time: null
+          }
         };
         setUpcomingFight(fightWithDefaults);
       } else {

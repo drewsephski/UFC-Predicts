@@ -3,10 +3,9 @@ import type { Fighter, CareerStats } from '@/types/mma';
 import { calculateAge } from '@/functions/date-helpers';
 
 // Helper function to map API fighter data (PascalCase) to frontend Fighter type (camelCase)
-const mapFighterData = (apiFighter: ApiFighter | null | undefined): Fighter | null => {
-  // Assume apiFighter has properties like FighterId, FirstName, LastName, WeightClass, etc.
-  // Add console.log(apiFighter) here temporarily if you need to inspect the exact structure
+// In ufc-context.tsx, update the mapFighterData function:
 
+const mapFighterData = (apiFighter: ApiFighter | null | undefined): Fighter | null => {
   if (!apiFighter) {
     return null;
   }
@@ -16,22 +15,21 @@ const mapFighterData = (apiFighter: ApiFighter | null | undefined): Fighter | nu
   const draws = apiFighter.Draws ?? 0;
 
   return {
-    id: apiFighter.FighterId?.toString() || '', // Convert number to string
-    firstName: apiFighter.FirstName ?? null,
-    lastName: apiFighter.LastName ?? null,
-    name: `${apiFighter.FirstName || ''} ${apiFighter.LastName || ''}`.trim(), // Combine names
+    id: apiFighter.FighterId?.toString() || '',
+    name: apiFighter.FirstName && apiFighter.LastName
+      ? `${apiFighter.FirstName} ${apiFighter.LastName}`.trim()
+      : apiFighter.FirstName || apiFighter.LastName || 'Unknown Fighter',
     nickname: apiFighter.Nickname ?? null,
     division: apiFighter.WeightClass ?? 'Unknown',
-    // Assuming ranking, isChampion, and country are present or can be derived
-    // The existing logic for champions uses TitleWins, let's keep that and derive isChampion
-    ranking: apiFighter.Ranking ?? null, // Assuming a 'Ranking' property exists
-    isChampion: (apiFighter.TitleWins ?? 0) > 0, // Derive from TitleWins
-    country: apiFighter.Country ?? null, // Assuming a 'Country' property exists
+    ranking: apiFighter.Ranking ?? null,
+    isChampion: (apiFighter.TitleWins ?? 0) > 0,
+    country: apiFighter.Country ?? null,
     birthDate: apiFighter.BirthDate ?? null,
-    age: apiFighter.BirthDate ? calculateAge(apiFighter.BirthDate) : 'N/A', // Calculate age
-    height: apiFighter.Height ?? null,
-    weight: apiFighter.Weight ?? null,
-    reach: apiFighter.Reach ?? null,
+    age: apiFighter.BirthDate ? calculateAge(apiFighter.BirthDate) : null,
+    // Convert numbers to strings for these fields
+    height: apiFighter.Height?.toString() ?? null,
+    weight: apiFighter.Weight?.toString() ?? null,
+    reach: apiFighter.Reach?.toString() ?? null,
     wins: wins,
     losses: losses,
     draws: draws,
@@ -45,11 +43,11 @@ const mapFighterData = (apiFighter: ApiFighter | null | undefined): Fighter | nu
     titleDraws: apiFighter.TitleDraws ?? null,
     record: `${wins}-${losses}-${draws}`,
     careerStats: apiFighter.CareerStats ? {
-      FighterId: apiFighter.CareerStats.FighterId ?? undefined,
+      FighterId: apiFighter.CareerStats.FighterId,
       sigStrikesLandedPerMinute: apiFighter.CareerStats.SigStrikesLandedPerMinute ?? null,
       sigStrikeAccuracy: apiFighter.CareerStats.SigStrikeAccuracy ?? null,
       takedownAverage: apiFighter.CareerStats.TakedownAverage ?? null,
-      submissionAverage: apiFighter.CareerStats.SubmissionAverage ?? null,
+      submissionAverage: apiFighter.CareerStats.SubmissionAverage ?? null, // Changed from SubmissionPercentage
       knockoutPercentage: apiFighter.CareerStats.KnockoutPercentage ?? null,
       technicalKnockoutPercentage: apiFighter.CareerStats.TechnicalKnockoutPercentage ?? null,
       decisionPercentage: apiFighter.CareerStats.DecisionPercentage ?? null,
@@ -57,10 +55,9 @@ const mapFighterData = (apiFighter: ApiFighter | null | undefined): Fighter | nu
       takedownDefense: apiFighter.CareerStats.TakedownDefense ?? null,
       strikingDefense: apiFighter.CareerStats.StrikingDefense ?? null,
     } : null,
-    imageUrl: apiFighter.image_url ?? null, // Map image_url to imageUrl
+    imageUrl: apiFighter.image_url ?? null,
   };
 };
-
 // Define API response types based on assumed PascalCase from Prisma/API
 interface ApiCareerStats {
   FighterId?: number;
