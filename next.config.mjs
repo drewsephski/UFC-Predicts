@@ -3,11 +3,16 @@
 /**
  * @type {import('next').NextConfig}
  **/
+const isGithubPages = process.env.NODE_ENV === 'production' && process.env.DEPLOY_TARGET === 'github';
+const isNetlify = process.env.NETLIFY === 'true';
+
 const nextConfig = {
-  // For GitHub Pages
-  output: 'export',
-  basePath: process.env.NODE_ENV === 'production' ? '/UFC-Predicts' : '',
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/UFC-Predicts/' : '',
+  // Enable static export for GitHub Pages
+  output: isGithubPages ? 'export' : undefined,
+  
+  // Base path and asset prefix for GitHub Pages
+  basePath: isGithubPages ? '/UFC-Predicts' : '',
+  assetPrefix: isGithubPages ? '/UFC-Predicts/' : '',
   images: {
     unoptimized: true, // Required for static exports
     remotePatterns: [

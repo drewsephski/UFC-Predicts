@@ -2,6 +2,7 @@
   command = "npm run build"
   publish = ".next"
   functions = ".next/functions"
+  environment = { NETLIFY = "true" }
 
 [build.environment]
   NEXT_TELEMETRY_DISABLED = "1"

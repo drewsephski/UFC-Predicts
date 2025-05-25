@@ -183,7 +183,12 @@ export function FighterPredictionForm({ fighter, upcomingFight }: FighterPredict
               max={100}
               step={1}
               value={[confidence]}
-              onValueChange={(values) => setConfidence(values[0])}
+              onValueChange={(values) => {
+                const newValue = values[0];
+                if (newValue !== undefined) {
+                  setConfidence(newValue);
+                }
+              }}
               className="py-4"
             />
             <div className="flex justify-between text-xs text-muted-foreground">

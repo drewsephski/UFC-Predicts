@@ -1,25 +1,12 @@
 'use client';
-import { useParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import { BarChart3, Calendar, Flag, Ruler, Scale, Trophy, User } from 'lucide-react';
-import Link from 'next/link';
-import Image from 'next/image';
 
-import { getFighters, getUpcomingFights } from '@/lib/api/ufc';
-import type { Fighter } from '@/types/mma';
-import type { Fight } from '@/contexts/ufc-context';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Container } from '@/components';
-import { LoadingState, ErrorState } from '@/components/ui/loading-state';
-import { useUFC } from '@/contexts/ufc-context';
-import { FighterPredictionForm } from '@/components/fighters/fighter-prediction-form';
-import { FighterStats } from '@/components/fighters/fighter-stats';
-import { FighterFightHistory } from '@/components/fighters/fighter-fight-history';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { PaginationNav } from '@/components/ui/pagination-nav';
+import { useState, useEffect } from 'react';
+import { useRouter, useParams } from 'next/navigation';
+import Image from 'next/image';
+import { Trophy, User, Calendar, BarChart3, Flag, Ruler, Scale } from 'lucide-react';
+
+import type { Fighter, Fight } from '@/types/mma';
+import type { FC } from 'react';
 
 // Types
 type PageProps = {
@@ -27,13 +14,25 @@ type PageProps = {
   searchParams?: { [key: string]: string | string[] | undefined };
 };
 
-// Get navigation fighters (previous/next in the same division)
-function getNavigationFighters(fighters: Fighter[], currentFighter: Fighter) {
-  const divisionFighters = fighters
-    .filter((f: Fighter) => f.division === currentFighter.division)
-    .sort((a: Fighter, b: Fighter) => (a.ranking || 0) - (b.ranking || 0) || a.name.localeCompare(b.name));
+// Components
+import { Breadcrumb, Container, ErrorState, LoadingState, PaginationNav } from '@/components';
+import { Badge } from '@/components/ui/badge';
+import { useUFC } from '@/contexts/ufc-context';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { FighterStats } from '@/components/fighters/fighter-stats';
+import { FighterFightHistory } from '@/components/fighters/fighter-fight-history';
+import { FighterPredictionForm } from '@/components/fighters/fighter-prediction-form';
 
-  const currentIndex = divisionFighters.findIndex((f: Fighter) => f.id === currentFighter.id);
+// Get navigation fighters (previous/next in the same division)
+function getNavigationFighters(fighters: Fighter[], currentFighter: Fighter): { prev: Fighter | null; next: Fighter | null } {
+  const divisionFighters = fighters
+    .filter((f) => f.division === currentFighter.division)
+    .sort((a, b) => (a.ranking || 0) - (b.ranking || 0) || a.name.localeCompare(b.name));
+
+  const currentIndex = divisionFighters.findIndex((f) => f.id === currentFighter.id);
 
   return {
     prev: divisionFighters[currentIndex - 1] || null,
@@ -60,8 +59,9 @@ const formatWeight = (weightInPounds: number | null): string => {
   return `${weightInPounds} lbs`;
 };
 
-export default function FighterDetailPage({ params }: PageProps) {
+const FighterDetailPage: FC<PageProps> = ({ params }) => {
   const router = useRouter();
+  const { id } = params;
   const fighterId = params.id as string; // Type assertion for TypeScript
 
   // Handle case where fighterId is an array (shouldn't happen with proper routing)
@@ -145,17 +145,9 @@ export default function FighterDetailPage({ params }: PageProps) {
     }
   }, [fighter, upcomingFights, loadingFights]);
 
-  if (isLoading) {
-    return <LoadingState text="Loading fighter details..." fullPage />;
-  }
-
-  if (error) {
-    return <ErrorState error={error} fullPage onRetry={refreshFighters} />;
-  }
-
-  if (!fighter) {
-    return <ErrorState error="Fighter not found" fullPage />;
-  }
+  if (isLoading) return <LoadingState />;
+  if (error) return <ErrorState error={error} />;
+  if (!fighter) return <div>Fighter not found</div>;
 
   return (
     <Container className="py-8">
@@ -281,18 +273,14 @@ export default function FighterDetailPage({ params }: PageProps) {
               <div className="mt-6 p-4 bg-red-950/20 rounded-lg">
                 <h3 className="font-semibold mb-2">Upcoming Fight</h3>
                 <p className="text-sm text-muted-foreground mb-1">
-                  {new Date(upcomingFight.date).toLocaleDateString('en-US', {
- year: 'numeric',
+                  {upcomingFight.date ? new Date(upcomingFight.date).toLocaleDateString('en-US', {
+                    year: 'numeric',
                     month: 'long',
                     day: 'numeric'
-                  })}
+                  }) : 'Date TBD'}
                 </p>
                 <p className="text-sm mb-3">
-                  vs. {
- upcomingFight.redCornerId.toString() === fighter.id.toString()
- ? upcomingFight.blueCorner?.name || 'Opponent'
-                      : upcomingFight.redCorner?.name || 'Opponent'
-                  }
+                  vs. {upcomingFight.redCornerId === fighter.id ? 'Opponent' : 'Opponent'}
                 </p>
                 <Button variant="outline" className="w-full text-red-400 border-red-500/30 hover:bg-red-950/30">
                   View Fight Details
@@ -380,3 +368,4 @@ export default function FighterDetailPage({ params }: PageProps) {
   );
 };
 
+export default FighterDetailPage;

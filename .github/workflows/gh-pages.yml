@@ -31,6 +31,8 @@ jobs:
         run: npm ci
 
       - name: Build
+        env:
+          DEPLOY_TARGET: github
         run: |
           npm run build
           touch out/.nojekyll

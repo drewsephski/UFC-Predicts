@@ -38,3 +38,5 @@ next-env.d.ts
 
 # other
 index.txt
+# Local Netlify folder
+.netlify
