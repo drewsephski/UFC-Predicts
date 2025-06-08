@@ -61,3 +61,29 @@ export interface Fight {
   } | null;
   // Add any other fight-specific fields here
 }
+
+export interface Event {
+  id: string;
+  name: string;
+  date: string; // ISO date string
+  location: string;
+  venue: string | null;
+  poster?: string;
+  mainCard: Fight[];
+  prelimCard: Fight[];
+}
+
+export interface Prediction {
+  id: string;
+  userId: string;
+  fightId: string;
+  predictedWinnerId: string;
+  method: string;
+  round?: number;
+  confidence: number;
+  notes?: string;
+  isCorrect?: boolean;
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+  fighter?: Fighter | null; // Represents the predicted fighter if available
+}
