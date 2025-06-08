@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode, useCallback } from 'react';
-import type { Fighter, CareerStats } from '@/types/mma';
+import type { Fighter, CareerStats, Fight, Event, Prediction } from '@/types/mma';
 import { calculateAge } from '@/functions/date-helpers';
 
 // Helper function to map API fighter data (PascalCase) to frontend Fighter type (camelCase)
@@ -157,52 +157,7 @@ export interface Venue {
   country: string;
 }
 
-export interface Fight {
-  id: string;
-  eventId: string;
-  redCornerId: string;
-  blueCornerId: string;
-  weightClass: string;
-  isMainEvent: boolean;
-  isTitleFight: boolean;
-  rounds: number;
-  date: string; // ISO date string
-  status: 'scheduled' | 'completed' | 'cancelled';
-  result?: {
-    winnerId?: string;
-    method?: string;
-    round?: number;
-    time?: string;
-  } | null; // Allow null for result
-  redCorner?: Fighter | null; // Allow null
-  blueCorner?: Fighter | null; // Allow null
-}
-
-export interface Event {
-  id: string;
-  name: string;
-  date: string; // ISO date string
-  location: string;
-  venue: string | null;
-  poster?: string;
-  mainCard: Fight[];
-  prelimCard: Fight[];
-}
-
-export interface Prediction {
-  id: string;
-  userId: string;
-  fightId: string;
-  predictedWinnerId: string;
-  method: string;
-  round?: number;
-  confidence: number;
-  notes?: string;
-  isCorrect?: boolean;
-  createdAt: string; // ISO date string
-  updatedAt: string; // ISO date string
-  fighter?: Fighter | null; // Allow null
-}
+// Fight, Event, and Prediction interfaces are now imported from '@/types/mma'
 
 interface UFCContextType {
   // Fighters
@@ -324,18 +279,40 @@ export const UFCProvider = ({ children }: { children: ReactNode }) => {
       const upcomingData: ApiEvent[] = await upcomingResponse.json();
 
       // Map fighter data within fights in upcoming events
-      const mappedUpcomingEvents = upcomingData.map(event => ({
+      const mappedUpcomingEvents: Event[] = upcomingData.map(event => ({
         ...event,
-        mainCard: event.mainCard.map((fight: ApiFight) => ({
-          ...fight,
-          redCorner: mapFighterData(fight.redCorner), // Use mapFighterData, handles null
-          blueCorner: mapFighterData(fight.blueCorner), // Use mapFighterData, handles null
-        })),
-        prelimCard: event.prelimCard.map((fight: ApiFight) => ({
-          ...fight,
-          redCorner: mapFighterData(fight.redCorner), // Use mapFighterData, handles null
-          blueCorner: mapFighterData(fight.blueCorner), // Use mapFighterData, handles null
-        })),
+        mainCard: event.mainCard.map((fight: ApiFight): Fight => {
+          const { redCorner, blueCorner, ...restOfFight } = fight;
+          return {
+            ...restOfFight,
+            eventName: event.name,
+            redCornerName: mapFighterData(redCorner)?.name || 'TBA',
+            blueCornerName: mapFighterData(blueCorner)?.name || 'TBA',
+            result: fight.result ? {
+              winnerId: fight.result.winnerId || null,
+              method: fight.result.method || null,
+              round: fight.result.round || null,
+              time: fight.result.time || null,
+            } : null,
+            // redCornerId and blueCornerId are already part of ...restOfFight
+          };
+        }),
+        prelimCard: event.prelimCard.map((fight: ApiFight): Fight => {
+          const { redCorner, blueCorner, ...restOfFight } = fight;
+          return {
+            ...restOfFight,
+            eventName: event.name,
+            redCornerName: mapFighterData(redCorner)?.name || 'TBA',
+            blueCornerName: mapFighterData(blueCorner)?.name || 'TBA',
+            result: fight.result ? {
+              winnerId: fight.result.winnerId || null,
+              method: fight.result.method || null,
+              round: fight.result.round || null,
+              time: fight.result.time || null,
+            } : null,
+            // redCornerId and blueCornerId are already part of ...restOfFight
+          };
+        }),
       }));
 
       setUpcomingEvents(mappedUpcomingEvents);
@@ -346,18 +323,38 @@ export const UFCProvider = ({ children }: { children: ReactNode }) => {
       const pastData: ApiEvent[] = await pastResponse.json();
 
       // Map fighter data within fights in past events
-      const mappedPastEvents = pastData.map(event => ({
+      const mappedPastEvents: Event[] = pastData.map(event => ({
         ...event,
-        mainCard: event.mainCard.map((fight: ApiFight) => ({
-          ...fight,
-          redCorner: mapFighterData(fight.redCorner), // Use mapFighterData, handles null
-          blueCorner: mapFighterData(fight.blueCorner), // Use mapFighterData, handles null
-        })),
-        prelimCard: event.prelimCard.map((fight: ApiFight) => ({
-          ...fight,
-          redCorner: mapFighterData(fight.redCorner), // Use mapFighterData, handles null
-          blueCorner: mapFighterData(fight.blueCorner), // Use mapFighterData, handles null
-        })),
+        mainCard: event.mainCard.map((fight: ApiFight): Fight => {
+          const { redCorner, blueCorner, ...restOfFight } = fight;
+          return {
+            ...restOfFight,
+            eventName: event.name,
+            redCornerName: mapFighterData(redCorner)?.name || 'TBA',
+            blueCornerName: mapFighterData(blueCorner)?.name || 'TBA',
+            result: fight.result ? {
+              winnerId: fight.result.winnerId || null,
+              method: fight.result.method || null,
+              round: fight.result.round || null,
+              time: fight.result.time || null,
+            } : null,
+          };
+        }),
+        prelimCard: event.prelimCard.map((fight: ApiFight): Fight => {
+          const { redCorner, blueCorner, ...restOfFight } = fight;
+          return {
+            ...restOfFight,
+            eventName: event.name,
+            redCornerName: mapFighterData(redCorner)?.name || 'TBA',
+            blueCornerName: mapFighterData(blueCorner)?.name || 'TBA',
+            result: fight.result ? {
+              winnerId: fight.result.winnerId || null,
+              method: fight.result.method || null,
+              round: fight.result.round || null,
+              time: fight.result.time || null,
+            } : null,
+          };
+        }),
       }));
 
       setPastEvents(mappedPastEvents);
@@ -380,11 +377,21 @@ export const UFCProvider = ({ children }: { children: ReactNode }) => {
       const data: ApiFight[] = await response.json();
 
       // Map fighter data within upcoming fights
-      const mappedUpcomingFights = data.map(fight => ({
-        ...fight,
-        redCorner: mapFighterData(fight.redCorner), // Use mapFighterData, handles null
-        blueCorner: mapFighterData(fight.blueCorner), // Use mapFighterData, handles null
-      }));
+      const mappedUpcomingFights: Fight[] = data.map(fight => {
+        const { redCorner, blueCorner, ...restOfFight } = fight;
+        return {
+          ...restOfFight,
+          eventName: 'Event Name TBD', // Placeholder as event context is not available here
+          redCornerName: mapFighterData(redCorner)?.name || 'TBA',
+          blueCornerName: mapFighterData(blueCorner)?.name || 'TBA',
+          result: fight.result ? {
+            winnerId: fight.result.winnerId || null,
+            method: fight.result.method || null,
+            round: fight.result.round || null,
+            time: fight.result.time || null,
+          } : null,
+        };
+      });
 
       setUpcomingFights(mappedUpcomingFights);
     } catch (error) {
@@ -406,7 +413,7 @@ export const UFCProvider = ({ children }: { children: ReactNode }) => {
       const data: ApiPrediction[] = await response.json();
 
       // Map fighter data within predictions
-      const mappedPredictions = data.map(prediction => ({
+      const mappedPredictions: Prediction[] = data.map(prediction => ({
         ...prediction,
         fighter: mapFighterData(prediction.fighter), // Use mapFighterData, handles null
         // Ensure dates are correctly formatted if needed elsewhere
