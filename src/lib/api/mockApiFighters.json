@@ -1,0 +1,139 @@
+[
+  {
+    "id": "fighter-001",
+    "name": "Alex Pereira",
+    "nickname": "Poatan",
+    "birth_date": "1987-07-07",
+    "nationality": "Brazilian",
+    "height_cm": 193,
+    "weight_kg": 92.9,
+    "reach_cm": 200,
+    "style": "Kickboxing",
+    "trains_at": "Teixeira MMA & Fitness",
+    "record": {
+      "wins": 10,
+      "losses": 2,
+      "draws": 0,
+      "knockouts": 7,
+      "submissions": 0
+    },
+    "recent_fights": [
+      { "fight_id": "fight-123", "opponent": "Israel Adesanya", "result": "win", "method": "KO/TKO", "round": 2, "date": "2023-04-08" },
+      { "fight_id": "fight-124", "opponent": "Jan Błachowicz", "result": "win", "method": "Decision - Split", "round": 3, "date": "2023-07-29" }
+    ],
+    "rankings": {
+      "light_heavyweight": "Champion"
+    },
+    "image_url": "/fighters/alex-pereira.jpg",
+    "advanced_stats": {
+      "significant_strikes_landed_per_minute": 5.89,
+      "striking_accuracy_percentage": 62,
+      "takedown_average_per_15_minutes": 0.2,
+      "takedown_defense_percentage": 70,
+      "submission_average_per_15_minutes": 0.0
+    }
+  },
+  {
+    "id": "fighter-002",
+    "name": "Jiří Procházka",
+    "nickname": "Denisa",
+    "birth_date": "1992-10-14",
+    "nationality": "Czech",
+    "height_cm": 193,
+    "weight_kg": 93,
+    "reach_cm": 203,
+    "style": "Muay Thai",
+    "trains_at": "Jetsaam Gym Brno",
+    "record": {
+      "wins": 30,
+      "losses": 4,
+      "draws": 1,
+      "knockouts": 26,
+      "submissions": 3
+    },
+    "recent_fights": [
+      { "fight_id": "fight-125", "opponent": "Aleksandar Rakić", "result": "win", "method": "KO/TKO", "round": 2, "date": "2024-04-13" },
+      { "fight_id": "fight-126", "opponent": "Alex Pereira", "result": "loss", "method": "KO/TKO", "round": 2, "date": "2023-11-11" }
+    ],
+    "rankings": {
+      "light_heavyweight": 1
+    },
+    "image_url": "/fighters/jiri-prochazka.jpg",
+    "advanced_stats": {
+      "significant_strikes_landed_per_minute": 5.77,
+      "striking_accuracy_percentage": 55,
+      "takedown_average_per_15_minutes": 0.5,
+      "takedown_defense_percentage": 68,
+      "submission_average_per_15_minutes": 0.8
+    }
+  },
+  {
+    "id": "fighter-003",
+    "name": "Islam Makhachev",
+    "nickname": "",
+    "birth_date": "1991-09-27",
+    "nationality": "Russian",
+    "height_cm": 178,
+    "weight_kg": 70.3,
+    "reach_cm": 179,
+    "style": "Sambo",
+    "trains_at": "American Kickboxing Academy / Eagles MMA",
+    "record": {
+      "wins": 25,
+      "losses": 1,
+      "draws": 0,
+      "knockouts": 5,
+      "submissions": 11
+    },
+    "recent_fights": [
+      { "fight_id": "fight-127", "opponent": "Alexander Volkanovski", "result": "win", "method": "KO/TKO", "round": 1, "date": "2023-10-21" },
+      { "fight_id": "fight-128", "opponent": "Alexander Volkanovski", "result": "win", "method": "Decision - Unanimous", "round": 5, "date": "2023-02-11" }
+    ],
+    "rankings": {
+      "lightweight": "Champion",
+      "pound-for-pound": 1
+    },
+    "image_url": "/fighters/islam-makhachev.jpg",
+    "advanced_stats": {
+      "significant_strikes_landed_per_minute": 2.37,
+      "striking_accuracy_percentage": 59,
+      "takedown_average_per_15_minutes": 3.26,
+      "takedown_defense_percentage": 90,
+      "submission_average_per_15_minutes": 1.9
+    }
+  },
+  {
+    "id": "fighter-004",
+    "name": "Dustin Poirier",
+    "nickname": "The Diamond",
+    "birth_date": "1989-01-19",
+    "nationality": "American",
+    "height_cm": 175,
+    "weight_kg": 70.3,
+    "reach_cm": 183,
+    "style": "Boxing, Brazilian Jiu-Jitsu",
+    "trains_at": "American Top Team",
+    "record": {
+      "wins": 30,
+      "losses": 8,
+      "draws": 0,
+      "knockouts": 15,
+      "submissions": 8
+    },
+    "recent_fights": [
+      { "fight_id": "fight-201", "opponent": "Benoît Saint Denis", "result": "win", "method": "KO/TKO", "round": 2, "date": "2024-03-09"},
+      { "fight_id": "fight-202", "opponent": "Justin Gaethje", "result": "loss", "method": "KO/TKO", "round": 2, "date": "2023-07-29"}
+    ],
+    "rankings": {
+      "lightweight": 2
+    },
+    "image_url": "/fighters/dustin-poirier.jpg",
+    "advanced_stats": {
+      "significant_strikes_landed_per_minute": 5.51,
+      "striking_accuracy_percentage": 50,
+      "takedown_average_per_15_minutes": 1.35,
+      "takedown_defense_percentage": 63,
+      "submission_average_per_15_minutes": 1.3
+    }
+  }
+]

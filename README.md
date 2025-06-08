@@ -2,7 +2,7 @@
 
 UFC Predicts is an application designed to provide predictions and statistics for UFC (Ultimate Fighting Championship) fights and fighters. Leveraging data analysis, it aims to offer insights into potential fight outcomes, fighter performance metrics, and overall UFC event tracking.
 
-## 🌟 Features
+## 🌟 Application Features
 
 - **Fighter Profiles:** Detailed statistics and information for UFC fighters.
 - **Event Tracking:** Information on upcoming and past UFC events.
@@ -10,6 +10,36 @@ UFC Predicts is an application designed to provide predictions and statistics fo
 - **Matchup Analysis:** Compare fighters head-to-head.
 - **User Accounts:** Sign up to save favorite fighters and track your prediction accuracy.
 - **Modern UI:** Built with a sleek red and black theme using Tailwind CSS and Shadcn UI.
+
+## 📊 Data Layer & API Features
+
+This project simulates a backend API for Mixed Martial Arts statistics, currently powered by local mock JSON data (`src/lib/api/mockApiFighters.json`, `src/lib/api/mockApiEvents.json`). The API functions are designed as if interacting with a more complex, hypothetical "MMAStatsAPI". Key data features implemented include:
+
+### Detailed Fighter Statistics
+The `Fighter` data model includes an `advanced_stats` field, providing more granular performance metrics such as:
+- Significant Strikes Landed Per Minute
+- Striking Accuracy Percentage
+- Takedown Average Per 15 Minutes
+- Takedown Defense Percentage
+- Submission Average Per 15 Minutes
+
+These statistics allow for deeper analysis of a fighter's capabilities and style.
+
+### Fight Outcome Probabilities
+The system includes logic to generate rudimentary fight outcome probabilities.
+- The `calculateFightProbabilities(fighterA, fighterB)` function in `src/lib/analysis/predictions.ts` calculates a score for each fighter based on their wins, knockouts, and losses.
+- These scores are then used to derive win probabilities for each fighter in a matchup.
+- The `getFightOutcomeProbabilities(fightId)` API function orchestrates fetching fighter data and returning these probabilities.
+
+### Enhanced Event Tracking
+Event and fight data have been enhanced to provide more comprehensive tracking:
+- **Fight Statuses:** Individual fights within an event can have statuses like `UPCOMING`, `LIVE`, `FINISHED`, or `CANCELLED`.
+- **Post-Fight Results:** For `FINISHED` fights, the data includes:
+    - `winner_id`: The ID of the winning fighter.
+    - `method`: The method of victory (e.g., 'KO/TKO', 'Submission (Rear Naked Choke)', 'Unanimous Decision').
+    - `round`: The round the fight ended.
+    - `time`: The time in the round when the fight concluded.
+This allows for a more dynamic and informative display of event details and historical results.
 
 ## 💻 Tech Stack
 

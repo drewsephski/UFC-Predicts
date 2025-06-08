@@ -1,0 +1,92 @@
+[
+  {
+    "id": "event-001",
+    "name": "UFC 303: Pereira vs. Procházka 2",
+    "date": "2024-06-29",
+    "location": "Las Vegas, Nevada",
+    "venue": "T-Mobile Arena",
+    "main_card": [
+      {
+        "fight_id": "fight-001-01",
+        "red_corner_fighter_id": "fighter-001",
+        "blue_corner_fighter_id": "fighter-002",
+        "weight_class": "Light Heavyweight",
+        "is_title_fight": true,
+        "status": "UPCOMING"
+      },
+      {
+        "fight_id": "fight-001-02",
+        "red_corner_fighter_id": "fighter-005",
+        "blue_corner_fighter_id": "fighter-006",
+        "weight_class": "Featherweight",
+        "is_title_fight": false,
+        "status": "LIVE"
+      }
+    ],
+    "prelim_card": [
+      {
+        "fight_id": "fight-001-03",
+        "red_corner_fighter_id": "fighter-007",
+        "blue_corner_fighter_id": "fighter-008",
+        "weight_class": "Welterweight",
+        "status": "FINISHED",
+        "winner_id": "fighter-007",
+        "method": "KO/TKO",
+        "round": 1,
+        "time": "3:45",
+        "details": "Liver kick"
+      },
+      {
+        "fight_id": "fight-001-04",
+        "red_corner_fighter_id": "fighter-009",
+        "blue_corner_fighter_id": "fighter-010",
+        "weight_class": "Flyweight",
+        "status": "UPCOMING"
+      }
+    ]
+  },
+  {
+    "id": "event-002",
+    "name": "UFC Fight Night: Makhachev vs. Poirier",
+    "date": "2024-06-01",
+    "location": "Newark, New Jersey",
+    "venue": "Prudential Center",
+    "main_card": [
+      {
+        "fight_id": "fight-002-01",
+        "red_corner_fighter_id": "fighter-003",
+        "blue_corner_fighter_id": "fighter-004",
+        "weight_class": "Lightweight",
+        "is_title_fight": true,
+        "status": "FINISHED",
+        "winner_id": "fighter-003",
+        "method": "Submission (Guillotine Choke)",
+        "round": 5,
+        "time": "2:58",
+        "details": "Makhachev defended his title."
+      }
+    ],
+    "prelim_card": [
+      {
+        "fight_id": "fight-002-02",
+        "red_corner_fighter_id": "fighter-011",
+        "blue_corner_fighter_id": "fighter-012",
+        "weight_class": "Middleweight",
+        "status": "FINISHED",
+        "winner_id": "fighter-012",
+        "method": "Decision - Unanimous",
+        "round": 3,
+        "time": "5:00",
+        "details": "Close fight."
+      },
+      {
+        "fight_id": "fight-002-03",
+        "red_corner_fighter_id": "fighter-013",
+        "blue_corner_fighter_id": "fighter-014",
+        "weight_class": "Bantamweight",
+        "status": "CANCELLED",
+        "details": "Fighter missed weight."
+      }
+    ]
+  }
+]
