@@ -2,11 +2,11 @@
   command = "npm run build"
   publish = ".next"
   functions = ".next/functions"
-  environment = { 
-    NETLIFY = "true",
-    NEXT_TELEMETRY_DISABLED = "1",
-    NETLIFY_NEXT_PLUGIN_SKIP = "true"
-  }
+
+[build.environment]
+  NETLIFY = "true"
+  NEXT_TELEMETRY_DISABLED = "1"
+  NETLIFY_NEXT_PLUGIN_SKIP = "true"
 
 # Required for Next.js 13+ with App Router
 [[plugins]]
