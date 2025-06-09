@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import type { FighterProfile, Fight } from '@/types/mma-api'; // Assuming types are in mma-api.ts
 
+// Cache configuration
+const predictionCache = new Map<string, { predictionData: any; timestamp: number }>();
+const REVALIDATE_PREDICTION_AFTER_SECONDS = 3600; // Revalidate every hour
+
 const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
 const RAPIDAPI_HOST = 'mmaapi.p.rapidapi.com'; // Or your specific host if different
 
@@ -21,14 +25,15 @@ interface ApiError {
 /**
  * Fetches fighter details from the MMA API.
  * @param fighterId The ID of the fighter.
- * @returns A Promise resolving to FighterProfile or null if an error occurs.
+ * @returns A Promise resolving to an object containing FighterProfile or an error object.
  */
-async function fetchFighterDetails(fighterId: string): Promise<FighterProfile | null> {
+async function fetchFighterDetails(fighterId: string): Promise<{ data: FighterProfile | null; error: ApiError | null }> {
   if (!RAPIDAPI_KEY) {
-    console.error('API key is not configured');
-    return null;
+    const msg = `fetchFighterDetails: RAPIDAPI_KEY not configured. Cannot fetch fighter ${fighterId}.`;
+    console.error(msg);
+    return { data: null, error: { message: "API key not configured server-side.", status: 500, details: msg } };
   }
-  const url = `https://mmaapi.p.rapidapi.com/api/mma/fighter/${fighterId}`; // Adjust if your path is different
+  const url = `https://mmaapi.p.rapidapi.com/api/mma/fighter/${fighterId}`;
   const options = {
     method: 'GET',
     headers: {
@@ -40,14 +45,17 @@ async function fetchFighterDetails(fighterId: string): Promise<FighterProfile | 
   try {
     const response = await fetch(url, options);
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error(`Failed to fetch fighter ${fighterId}: ${response.status}`, errorData);
-      return null;
+      const errorText = await response.text();
+      const msg = `fetchFighterDetails: Failed to fetch fighter ${fighterId}. Status: ${response.status}. Body: ${errorText}`;
+      console.error(msg);
+      return { data: null, error: { message: `External API error fetching fighter ${fighterId}.`, status: response.status >= 500 ? 502 : response.status, details: errorText } };
     }
-    return await response.json() as FighterProfile;
-  } catch (error) {
-    console.error(`Error fetching fighter ${fighterId}:`, error);
-    return null;
+    const data = await response.json() as FighterProfile;
+    return { data, error: null };
+  } catch (error: any) {
+    const msg = `fetchFighterDetails: Exception fetching fighter ${fighterId}.`;
+    console.error(msg, error);
+    return { data: null, error: { message: "Internal server error during API call to fetch fighter details.", status: 500, details: error.message } };
   }
 }
 
@@ -56,18 +64,15 @@ async function fetchFighterDetails(fighterId: string): Promise<FighterProfile | 
  * For this example, we'll assume the event details contain direct fighter IDs.
  * In a real scenario, the structure might be more complex (e.g., `competitors` array).
  * @param eventId The ID of the event (fightId is used as eventId here).
- * @returns A Promise resolving to an object with fighterAId and fighterBId or null.
+ * @returns A Promise resolving to an object containing competitor IDs or an error object.
  */
-async function fetchEventCompetitorIds(eventId: string): Promise<{ fighterAId: string; fighterBId: string } | null> {
+async function fetchEventCompetitorIds(eventId: string): Promise<{ data: { fighterAId: string; fighterBId: string } | null; error: ApiError | null }> {
   if (!RAPIDAPI_KEY) {
-    console.error('API key is not configured for event fetch');
-    return null;
+    const msg = `fetchEventCompetitorIds: RAPIDAPI_KEY not configured. Cannot fetch event ${eventId}.`;
+    console.error(msg);
+    return { data: null, error: { message: "API key not configured server-side.", status: 500, details: msg } };
   }
-  // This URL is hypothetical. Replace with the actual MMA API endpoint for event details
-  // that provides competitor IDs for a given fight/event.
-  // The user suggested /api/event/[id] or /live for this.
-  // Let's assume /api/event/${eventId} returns { fighters: [{id: 'id1'}, {id: 'id2'}] } or similar
-  const url = `https://mmaapi.p.rapidapi.com/api/mma/event/${eventId}`;
+  const url = `https://mmaapi.p.rapidapi.com/api/mma/event/${eventId}`; // Hypothetical URL
   const options = {
     method: 'GET',
     headers: {
@@ -79,48 +84,27 @@ async function fetchEventCompetitorIds(eventId: string): Promise<{ fighterAId: s
   try {
     const response = await fetch(url, options);
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error(`Failed to fetch event ${eventId}: ${response.status}`, errorData);
-      return null;
+      const errorText = await response.text();
+      const msg = `fetchEventCompetitorIds: Failed to fetch event ${eventId}. Status: ${response.status}. Body: ${errorText}`;
+      console.error(msg);
+      return { data: null, error: { message: `External API error fetching event ${eventId}.`, status: response.status >= 500 ? 502 : response.status, details: errorText } };
     }
     const eventData = await response.json();
+
     // Adapt this based on the actual structure of your event API response
-    // Example: if eventData.fighters is an array of { id: string, role: 'fighter1' | 'fighter2' }
-    // Or if it's eventData.competitors.home.id and eventData.competitors.away.id
-    // For now, assuming a simple structure:
     if (eventData.fighters && eventData.fighters.length >= 2) {
-      return { fighterAId: eventData.fighters[0].id, fighterBId: eventData.fighters[1].id };
-    } else if (eventData.mainCard && eventData.mainCard.length > 0 && eventData.mainCard[0].fighterAId && eventData.mainCard[0].fighterBId) {
-      // Alternative: Assuming fightId corresponds to a fight within an event's mainCard or prelims
-      // This requires knowing which fight in the card corresponds to the fightId
-      // This part is highly speculative and depends on how fightId relates to event structure
-      // For this example, let's assume if the top-level fighters array isn't there,
-      // and the fightId is for the *first* fight in the main card for simplicity.
-      // A robust solution needs a way to map fightId to the correct pair of fighters in the eventData.
-      // This is a common challenge with such APIs if fightId isn't a direct lookup for a pairing.
-      // The prompt implies fightId is the ID of the "fight" itself. If an event has many fights,
-      // the event endpoint might return an array of fights, each with competitor IDs.
-      // Let's assume eventData itself might be an array of fights if the ID is specific enough,
-      // or it's an object with a `fights` array.
-      // This part is a placeholder for actual API structure discovery.
-      // A common pattern: eventData.fights.find(f => f.id === eventId) then get its competitors.
-      // For now, sticking to the simpler `eventData.fighters` or a direct `fighterAId, fighterBId` on the event object.
-      // The provided example from the user was `eventData.fighters[0].id`
-      console.warn(`'eventData.fighters' not found or insufficient. Check API response structure for event ${eventId}. Attempting fallback...`);
-      // This fallback is too speculative. Better to rely on a clear structure.
-      // If eventData *is* the fight object itself:
-      if (eventData.fighterAId && eventData.fighterBId) {
-        return { fighterAId: eventData.fighterAId, fighterBId: eventData.fighterBId };
-      }
-      console.error('Could not extract fighter IDs from event data structure:', eventData);
-      return null;
+      return { data: { fighterAId: eventData.fighters[0].id, fighterBId: eventData.fighters[1].id }, error: null };
+    } else if (eventData.fighterAId && eventData.fighterBId) { // If eventData *is* the fight object itself
+        return { data: { fighterAId: eventData.fighterAId, fighterBId: eventData.fighterBId }, error: null };
     } else {
-      console.error('Could not extract fighter IDs from event data:', eventData);
-      return null;
+      const msg = `fetchEventCompetitorIds: Could not extract fighter IDs from event data structure for event ${eventId}.`;
+      console.error(msg, eventData);
+      return { data: null, error: { message: "Could not parse competitor IDs from external API response.", status: 500, details: msg } };
     }
-  } catch (error) {
-    console.error(`Error fetching event ${eventId}:`, error);
-    return null;
+  } catch (error: any) {
+    const msg = `fetchEventCompetitorIds: Exception fetching event ${eventId}.`;
+    console.error(msg, error);
+    return { data: null, error: { message: "Internal server error during API call to fetch event competitor IDs.", status: 500, details: error.message } };
   }
 }
 
@@ -154,44 +138,122 @@ export async function GET(
   const { fightId } = params;
 
   if (!fightId) {
-    return NextResponse.json({ error: 'Fight ID is required' }, { status: 400 });
+    console.warn(`GET /api/predict/[fightId]: Fight ID is missing in request params.`);
+    return NextResponse.json({ error: 'Fight ID is required in the path.' }, { status: 400 });
   }
 
   if (!RAPIDAPI_KEY) {
-    return NextResponse.json({ error: 'API key is not configured server-side' }, { status: 500 });
+    console.error(`GET /api/predict/${fightId}: RAPIDAPI_KEY is not configured server-side.`);
+    return NextResponse.json({ error: 'API key is not configured server-side. Cannot make prediction.' }, { status: 500 });
   }
 
-  // 1. Fetch event to get competitor IDs
-  const competitorIds = await fetchEventCompetitorIds(fightId);
-  if (!competitorIds) {
-    return NextResponse.json({ error: `Could not fetch competitor IDs for fight ${fightId}. Verify the event API endpoint and response structure.` }, { status: 500 });
+  const currentTime = Date.now();
+  const cachedEntry = predictionCache.get(fightId);
+
+  // Stale-while-revalidate caching logic
+  // 1. If cache exists and is fresh, serve from cache.
+  if (cachedEntry && (currentTime - cachedEntry.timestamp < REVALIDATE_PREDICTION_AFTER_SECONDS * 1000)) {
+    console.log(`GET /api/predict/${fightId}: Cache hit (fresh).`);
+    return NextResponse.json(cachedEntry.predictionData);
   }
-  const { fighterAId, fighterBId } = competitorIds;
+
+  // 2. If cache exists but is stale, serve stale data and revalidate in background.
+  if (cachedEntry) {
+    console.log(`GET /api/predict/${fightId}: Cache hit (stale). Serving stale data and revalidating in background.`);
+    // Don't await this call, let it run in the background
+    generatePrediction(fightId) // fightId is already validated to be present
+      .then(predictionResult => { // generatePrediction now returns { data, error }
+        if (predictionResult.data) {
+          predictionCache.set(fightId, { predictionData: predictionResult.data, timestamp: Date.now() });
+          console.log(`GET /api/predict/${fightId}: Cache updated after background revalidation.`);
+        } else if (predictionResult.error) {
+          console.error(`GET /api/predict/${fightId}: Background revalidation failed. Error: ${predictionResult.error.message}`, predictionResult.error.details || '');
+        }
+      })
+      .catch(error => { // Should ideally not be reached if generatePrediction catches its own errors
+        console.error(`GET /api/predict/${fightId}: Unexpected error during background revalidation promise chain.`, error);
+      });
+    return NextResponse.json(cachedEntry.predictionData); // Serve stale data
+  }
+
+  // 3. If no cache, fetch data, cache it, and serve.
+  console.log(`GET /api/predict/${fightId}: Cache miss. Fetching new prediction.`);
+  const predictionResult = await generatePrediction(fightId);
+
+  if (predictionResult.error) {
+    // If fetching new data results in an error (e.g., API failure), return that error
+    console.error(`GET /api/predict/${fightId}: Failed to generate prediction. Error: ${predictionResult.error.message}`, predictionResult.error.details || '');
+    return NextResponse.json(
+        { error: predictionResult.error.message, details: predictionResult.error.details },
+        { status: predictionResult.error.status || 500 }
+    );
+  }
+
+  if (!predictionResult.data) {
+      // This case should ideally be covered by predictionResult.error, but as a safeguard:
+      console.error(`GET /api/predict/${fightId}: Prediction generation returned no data and no error.`);
+      return NextResponse.json({ error: "Failed to generate prediction due to an unknown issue.", details: "No data was returned from the prediction function." }, { status: 500 });
+  }
+
+  // Cache the newly fetched data
+  predictionCache.set(fightId, { predictionData: predictionResult.data, timestamp: Date.now() });
+  console.log(`GET /api/predict/${fightId}: Prediction fetched and cached.`);
+  return NextResponse.json(predictionResult.data);
+}
+
+/**
+ * Generates a fight prediction.
+ * This function encapsulates the original logic for fetching data and calculating the prediction.
+ * It's used for both initial cache misses and background revalidations.
+ * @param fightId The ID of the fight.
+ * @returns A Promise resolving to an object containing prediction data or an error object.
+ */
+async function generatePrediction(fightId: string): Promise<{ data: any | null; error: ApiError | null }> {
+  // 1. Fetch event to get competitor IDs
+  const competitorIdsResult = await fetchEventCompetitorIds(fightId);
+  if (competitorIdsResult.error || !competitorIdsResult.data) {
+    console.error(`generatePrediction (fightId: ${fightId}): Failed to fetch competitor IDs.`, competitorIdsResult.error);
+    return { data: null, error: competitorIdsResult.error || { message: "Unknown error fetching competitor IDs.", status: 500 } };
+  }
+  const { fighterAId, fighterBId } = competitorIdsResult.data;
 
   // 2. Fetch stats for each fighter
-  const [fighterAProfile, fighterBProfile] = await Promise.all([
+  const [fighterAResult, fighterBResult] = await Promise.all([
     fetchFighterDetails(fighterAId),
     fetchFighterDetails(fighterBId),
   ]);
 
-  if (!fighterAProfile || !fighterBProfile) {
-    const errors: string[] = [];
-    if (!fighterAProfile) errors.push(`Failed to fetch details for fighter ${fighterAId}`);
-    if (!fighterBProfile) errors.push(`Failed to fetch details for fighter ${fighterBId}`);
-    return NextResponse.json({ error: 'Failed to fetch fighter details for one or both fighters', details: errors }, { status: 500 });
+  const errors: string[] = [];
+  if (fighterAResult.error || !fighterAResult.data) {
+    errors.push(`Failed to fetch details for fighter ${fighterAId}: ${fighterAResult.error?.message || 'Unknown error'}`);
+    console.error(`generatePrediction (fightId: ${fightId}): Fighter A fetch failed.`, fighterAResult.error);
   }
+  if (fighterBResult.error || !fighterBResult.data) {
+    errors.push(`Failed to fetch details for fighter ${fighterBId}: ${fighterBResult.error?.message || 'Unknown error'}`);
+    console.error(`generatePrediction (fightId: ${fightId}): Fighter B fetch failed.`, fighterBResult.error);
+  }
+
+  if (errors.length > 0 || !fighterAResult.data || !fighterBResult.data) {
+    // Determine combined status - prefer 502 if any upstream was 502, else 500, or specific status if only one error
+    let combinedStatus = 500;
+    if (fighterAResult.error?.status === 502 || fighterBResult.error?.status === 502) combinedStatus = 502;
+    else if (fighterAResult.error) combinedStatus = fighterAResult.error.status || 500;
+    else if (fighterBResult.error) combinedStatus = fighterBResult.error.status || 500;
+
+    return { data: null, error: { message: 'Failed to fetch fighter details for one or both fighters.', details: errors.join('; '), status: combinedStatus } };
+  }
+
+  const fighterAProfile = fighterAResult.data;
+  const fighterBProfile = fighterBResult.data;
 
   // 3. Feature Calculation
   const recentWinPctA = calculateRecentWinPct(fighterAProfile.fightHistory, NUMBER_OF_FIGHTS_FOR_RECENT_WIN_PCT);
   const recentWinPctB = calculateRecentWinPct(fighterBProfile.fightHistory, NUMBER_OF_FIGHTS_FOR_RECENT_WIN_PCT);
 
-  // Use appropriate stats fields from your FighterStats type in mma-api.ts
-  // These are examples, adjust to your actual type fields for averages
   const avgStrikesA = fighterAProfile.stats?.sigStrikesLandedPerMin ?? fighterAProfile.stats?.avgStrikesLanded ?? 0;
   const avgStrikesB = fighterBProfile.stats?.sigStrikesLandedPerMin ?? fighterBProfile.stats?.avgStrikesLanded ?? 0;
   const avgTakedownsA = fighterAProfile.stats?.avgTakedownsLandedPer15Min ?? fighterAProfile.stats?.avgTakedownsLanded ?? 0;
   const avgTakedownsB = fighterBProfile.stats?.avgTakedownsLandedPer15Min ?? fighterBProfile.stats?.avgTakedownsLanded ?? 0;
-
 
   // Differentials
   const X1_recentWinPctDiff = recentWinPctA - recentWinPctB;
@@ -203,20 +265,20 @@ export async function GET(
   const pA = 1 / (1 + Math.exp(-z));
   const pB = 1 - pA;
 
-  // 5. Return Response
-  return NextResponse.json({
+  // 5. Prepare Response Data
+  const predictionData = {
     fightId,
-    fighterAId: fighterAProfile.fighterId, // Return actual IDs used, helpful for client
+    fighterAId: fighterAProfile.fighterId,
     fighterBId: fighterBProfile.fighterId,
     fighterAName: `${fighterAProfile.firstName} ${fighterAProfile.lastName}`,
     fighterBName: `${fighterBProfile.firstName} ${fighterBProfile.lastName}`,
     prediction: {
-      [fighterAProfile.fighterId]: parseFloat(pA.toFixed(4)), // Probability for fighter A
-      [fighterBProfile.fighterId]: parseFloat(pB.toFixed(4)), // Probability for fighter B
-      fighterA: parseFloat(pA.toFixed(4)), // Generic key for fighter A
-      fighterB: parseFloat(pB.toFixed(4)), // Generic key for fighter B
+      [fighterAProfile.fighterId]: parseFloat(pA.toFixed(4)),
+      [fighterBProfile.fighterId]: parseFloat(pB.toFixed(4)),
+      fighterA: parseFloat(pA.toFixed(4)),
+      fighterB: parseFloat(pB.toFixed(4)),
     },
-    debug_features: { // Optional: for debugging, remove in production
+    debug_features: { // Optional: for debugging
         recentWinPctA: parseFloat(recentWinPctA.toFixed(3)),
         recentWinPctB: parseFloat(recentWinPctB.toFixed(3)),
         avgStrikesA: parseFloat(avgStrikesA.toFixed(2)),
@@ -228,5 +290,6 @@ export async function GET(
         deltaTakedowns: parseFloat(deltaTakedowns.toFixed(2)),
         z_value: parseFloat(z.toFixed(4)),
     }
-  });
+  };
+  return { data: predictionData, error: null };
 }

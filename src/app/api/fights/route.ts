@@ -32,8 +32,9 @@ export async function GET(req: NextRequest) {
       });
       
       if (!fight) {
+        console.log(`GET /api/fights?id=${id}: Fight not found in database.`);
         return NextResponse.json(
-          { error: "Fight not found" },
+          { error: "Fight not found", details: `No fight found with ID ${id}` },
           { status: 404 }
         );
       }
@@ -118,10 +119,14 @@ export async function GET(req: NextRequest) {
     });
     
     return NextResponse.json(fights);
-  } catch (error) {
-    console.error("Error fetching fights:", error);
+  } catch (error: any) {
+    const queryParams = req.nextUrl.searchParams.toString();
+    console.error(`GET /api/fights?${queryParams}: Error fetching fights.`, error);
     return NextResponse.json(
-      { error: "Failed to fetch fights" },
+      {
+        error: "Failed to fetch fights from database.",
+        details: error.message || "An unknown database error occurred."
+      },
       { status: 500 }
     );
   }
@@ -138,8 +143,9 @@ export async function POST(req: NextRequest) {
     
     // Check if user is authenticated
     if (!userId) {
+      console.warn(`POST /api/fights: Unauthorized access attempt.`);
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { error: "Unauthorized", details: "User authentication required." },
         { status: 401 }
       );
     }
@@ -150,19 +156,30 @@ export async function POST(req: NextRequest) {
     });
     
     if (!user || user.role !== "admin") {
+      console.warn(`POST /api/fights: Forbidden access attempt by userId ${userId} (not an admin).`);
       return NextResponse.json(
-        { error: "Unauthorized - Admin access required" },
+        { error: "Forbidden", details: "Admin access required to create fights." },
         { status: 403 }
       );
     }
     
     // Get fight data from request body
-    const data = await req.json();
+    let data;
+    try {
+      data = await req.json();
+    } catch (parseError: any) {
+      console.warn(`POST /api/fights: Invalid JSON in request body for userId: ${userId}.`, parseError);
+      return NextResponse.json({ error: "Invalid request body", details: "Request body must be valid JSON." }, { status: 400 });
+    }
     
     // Validate required fields
-    if (!data.eventId || !data.redCornerId || !data.blueCornerId || !data.weightClass) {
+    const requiredFields = ['eventId', 'redCornerId', 'blueCornerId', 'weightClass', 'status', 'date'];
+    const missingFields = requiredFields.filter(field => !(field in data) || data[field] === null || data[field] === undefined);
+
+    if (missingFields.length > 0) {
+      console.warn(`POST /api/fights: Missing required fields by userId ${userId}. Missing: ${missingFields.join(', ')}`);
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Missing required fields", details: `The following fields are required: ${missingFields.join(', ')}` },
         { status: 400 }
       );
     }
@@ -178,10 +195,11 @@ export async function POST(req: NextRequest) {
     });
     
     return NextResponse.json(fight, { status: 201 });
-  } catch (error) {
-    console.error("Error creating fight:", error);
+  } catch (error: any) {
+    const { userId } = auth(); // Re-auth for logging userId if available
+    console.error(`POST /api/fights: Error creating fight by userId ${userId || 'unknown'}.`, error);
     return NextResponse.json(
-      { error: "Failed to create fight" },
+      { error: "Failed to create fight in database.", details: error.message || "An unknown database error occurred." },
       { status: 500 }
     );
   }
@@ -200,8 +218,9 @@ export async function PUT(req: NextRequest) {
     
     // Check if user is authenticated
     if (!userId) {
+      console.warn(`PUT /api/fights: Unauthorized access attempt for fightId ${id || 'unknown'}.`);
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { error: "Unauthorized", details: "User authentication required." },
         { status: 401 }
       );
     }
@@ -212,22 +231,30 @@ export async function PUT(req: NextRequest) {
     });
     
     if (!user || user.role !== "admin") {
+      console.warn(`PUT /api/fights: Forbidden access attempt by userId ${userId} (not an admin) for fightId ${id || 'unknown'}.`);
       return NextResponse.json(
-        { error: "Unauthorized - Admin access required" },
+        { error: "Forbidden", details: "Admin access required to update fights." },
         { status: 403 }
       );
     }
     
     // Check if fight ID is provided
     if (!id) {
+      console.warn(`PUT /api/fights: Fight ID is missing in query params for userId: ${userId}.`);
       return NextResponse.json(
-        { error: "Fight ID is required" },
+        { error: "Fight ID is required", details: "Fight ID must be provided as a query parameter 'id'." },
         { status: 400 }
       );
     }
     
     // Get fight data from request body
-    const data = await req.json();
+    let data;
+    try {
+      data = await req.json();
+    } catch (parseError: any) {
+      console.warn(`PUT /api/fights: Invalid JSON in request body for userId: ${userId}, fightId: ${id}.`, parseError);
+      return NextResponse.json({ error: "Invalid request body", details: "Request body must be valid JSON." }, { status: 400 });
+    }
     
     // Update fight
     const fight = await db.fight.update({
@@ -241,10 +268,16 @@ export async function PUT(req: NextRequest) {
     });
     
     return NextResponse.json(fight);
-  } catch (error) {
-    console.error("Error updating fight:", error);
+  } catch (error: any) {
+    const { userId } = auth(); // Re-auth for logging
+    const fightId = new URL(req.url).searchParams.get("id"); // Re-get for logging
+    if (error.code === 'P2025') { // Prisma's record not found error
+        console.warn(`PUT /api/fights: Fight not found for update. fightId: ${fightId}, userId: ${userId || 'unknown'}.`, error);
+        return NextResponse.json({ error: "Fight not found", details: `Fight with ID ${fightId} not found.` }, { status: 404 });
+    }
+    console.error(`PUT /api/fights: Error updating fight ${fightId || 'unknown'} by userId ${userId || 'unknown'}.`, error);
     return NextResponse.json(
-      { error: "Failed to update fight" },
+      { error: "Failed to update fight in database.", details: error.message || "An unknown database error occurred." },
       { status: 500 }
     );
   }

@@ -10,62 +10,62 @@ type Link = {
 
 export const SIDEBAR_LINKS: Link[] = [
     {
-        href: "/dashboard",
+        href: "/app",
         label: "Dashboard",
         icon: ChartPieIcon,
     },
     {
-        href: "/dashboard/fighters",
+        href: "/app/fighters",
         label: "Fighters",
         icon: Dumbbell
     },
     {
-        href: "/dashboard/events",
+        href: "/app/events",
         label: "Events",
         icon: ClockIcon
     },
     {
-        href: "/dashboard/predictions",
+        href: "/app/predictions",
         label: "Predictions",
         icon: TrendingUp
     },
     {
-        href: "/dashboard/rankings",
+        href: "/app/rankings",
         label: "Rankings",
         icon: Trophy
     },
     {
-        href: "/dashboard/compare",
+        href: "/app/compare",
         label: "Compare Fighters",
         icon: Swords
     },
     {
-        href: "/dashboard/news",
+        href: "/app/news",
         label: "News",
         icon: NewspaperIcon
     },
     {
-        href: "/dashboard/pound-for-pound",
+        href: "/app/pound-for-pound",
         label: "Pound for Pound",
         icon: Award
     },
     {
-        href: "/dashboard/analytics",
+        href: "/app/analytics",
         label: "Fight Analytics",
         icon: LineChartIcon
     },
     {
-        href: "/dashboard/comments",
+        href: "/app/comments",
         label: "Community",
         icon: MessageSquare
     },
     {
-        href: "/dashboard/billing",
+        href: "/app/billing",
         label: "Billing",
         icon: CreditCardIcon
     },
     {
-        href: "/dashboard/settings",
+        href: "/app/settings",
         label: "Settings",
         icon: SettingsIcon
     }

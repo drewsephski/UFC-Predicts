@@ -4,6 +4,11 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import type { Fighter } from '@/types/mma';
 
+// Cache variables
+let cachedFighters: Fighter[] | null = null;
+let lastFetchTime: number | null = null;
+const REVALIDATE_AFTER_SECONDS = 3600; // Revalidate every hour
+
 // Mock data (replace with more comprehensive data as needed)
 const mockFighters: Fighter[] = [
   {
@@ -428,190 +433,233 @@ const mockFighters: Fighter[] = [
   },
 ];
 
-export async function GET(req: NextRequest) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
-    const division = searchParams.get("division");
-    
-    const apiKey = process.env.SPORTSDATA_API_KEY;
-
-    if (!apiKey) {
-        // Return mock data if API key is not configured
-        console.warn("SportsData API key is not configured. Using mock fighter data.");
-        let filteredFighters = mockFighters;
-        if (id) {
-            filteredFighters = filteredFighters.filter(f => f.FighterId === Number.parseInt(id, 10));
-        }
-        if (division) {
-            filteredFighters = filteredFighters.filter(f => f.WeightClass === division);
-        }
-        return NextResponse.json(filteredFighters);
+// Helper function to filter fighters
+function filterFighters(fighters: Fighter[], id: string | null, division: string | null): Fighter[] {
+    let result = fighters;
+    if (id) {
+        result = result.filter(f => f.FighterId === Number.parseInt(id, 10));
     }
+    if (division) {
+        result = result.filter(f => f.WeightClass === division);
+    }
+    return result;
+}
 
+// Function to fetch fighters from the API
+// Returns an object with data or error, to provide more context to the caller
+async function fetchFightersFromAPI(apiKey: string): Promise<{ data: Fighter[] | null; error: { message: string; status: number; details?: string } | null }> {
     const apiUrl = `https://api.sportsdata.io/v3/mma/stats/json/Fighters?key=${apiKey}`;
-
-    if (id) {
-        // If fetching a specific fighter by ID, we might need a different API endpoint or filter the results after fetching all data
-        // Assuming for now the main endpoint returns all fighters and we filter client-side in the API route.
-        // A more efficient approach would be to use an API endpoint that supports fetching by ID if available.
-    } else if (division) {
-        // For filtering by division, you might need to adjust the API call if SportsData.io supports it,
-        // otherwise filter the results after fetching all fighters.
-    }
-
-    const response = await fetch(apiUrl, { next: { revalidate: 3600 } }); // Cache for 1 hour
-
-    if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`Error fetching fighters: ${response.status} ${response.statusText} - ${errorText}`);
-        // Fallback to mock data on API error
-        console.warn("Failed to fetch from SportsData API. Using mock fighter data as fallback.");
-        let filteredFighters = mockFighters;
-        if (id) {
-            filteredFighters = filteredFighters.filter(f => f.FighterId === Number.parseInt(id, 10));
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            const errorText = await response.text();
+            const errorMessage = `External API Error: Failed to fetch fighters. Status: ${response.status} ${response.statusText}.`;
+            console.error(`fetchFightersFromAPI: ${errorMessage} Body: ${errorText}`);
+            // For external API errors, use 502 if it's a server-side error from them, otherwise their status.
+            const status = response.status >= 500 ? 502 : response.status;
+            return { data: null, error: { message: "Failed to fetch fighters from external provider.", status: status, details: errorText } };
         }
-        if (division) {
-            filteredFighters = filteredFighters.filter(f => f.WeightClass === division);
-        }
-        return NextResponse.json(filteredFighters);
+        const data: Fighter[] = await response.json();
+        cachedFighters = data; // Update cache
+        lastFetchTime = Date.now(); // Update fetch time
+        console.log("fetchFightersFromAPI: Fighters data fetched and cached successfully.");
+        return { data, error: null };
+    } catch (error: any) {
+        console.error("fetchFightersFromAPI: Exception occurred.", error);
+        return { data: null, error: { message: "Internal server error during API call to fetch fighters.", status: 500, details: error.message } };
     }
+}
 
-    const data: Fighter[] = await response.json();
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get("id");
+  const division = searchParams.get("division");
+  const queryParamsLog = `id=${id}, division=${division}`; // For logging
 
-    // Apply filtering based on id or division if needed after fetching all data
-    let filteredData = data;
-    if (id) {
-        filteredData = filteredData.filter(fighter => fighter.FighterId === Number.parseInt(id, 10));
-    }
-    if (division) {
-        filteredData = filteredData.filter(fighter => fighter.WeightClass === division);
-    }
+  const apiKey = process.env.SPORTSDATA_API_KEY;
 
-    return NextResponse.json(filteredData);
+  // Stale-while-revalidate caching strategy
+  // 1. Check if we have cached data and it's not older than REVALIDATE_AFTER_SECONDS.
+  // 2. If fresh enough, serve from cache.
+  // 3. If data is stale (older than REVALIDATE_AFTER_SECONDS), serve stale data and trigger a revalidation in the background.
+  // 4. If no cached data, fetch from API, cache it, and serve.
+  // 5. If API fetch fails (either initial or revalidation), continue serving stale data if available.
 
-  } catch (error) {
-    console.error("Error in fighters API route:", error);
-    // Fallback to mock data on catch error
-    console.warn("An error occurred in the API route. Using mock fighter data as fallback.");
-    let filteredFighters = mockFighters;
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
-    const division = searchParams.get("division");
-    if (id) {
-        filteredFighters = filteredFighters.filter(f => f.FighterId === Number.parseInt(id, 10));
+  const currentTime = Date.now();
+
+  if (cachedFighters && lastFetchTime && (currentTime - lastFetchTime < REVALIDATE_AFTER_SECONDS * 1000)) {
+    // Cache is fresh, serve from cache
+    console.log(`GET /api/fighters?${queryParamsLog}: Serving fresh data from cache.`);
+    return NextResponse.json(filterFighters(cachedFighters, id, division));
+  }
+
+  if (cachedFighters && lastFetchTime) {
+    // Cache is stale, serve stale data and revalidate in background
+    console.log(`GET /api/fighters?${queryParamsLog}: Serving stale data from cache and revalidating in background.`);
+    // Don't await this, let it run in the background
+    if (apiKey) {
+        fetchFightersFromAPI(apiKey)
+            .then(result => {
+                if (result.error) {
+                    console.error(`GET /api/fighters?${queryParamsLog}: Background revalidation failed. Error: ${result.error.message}`, result.error.details ? result.error.details : '');
+                } else {
+                    console.log(`GET /api/fighters?${queryParamsLog}: Background revalidation successful.`);
+                }
+            })
+            .catch(err => { // Should not happen if fetchFightersFromAPI always returns an object
+                console.error(`GET /api/fighters?${queryParamsLog}: Unexpected error during background revalidation fetch.`, err);
+            });
+    } else {
+        console.warn(`GET /api/fighters?${queryParamsLog}: SportsData API key is not configured. Cannot revalidate fighter data in background.`);
     }
-    if (division) {
-        filteredFighters = filteredFighters.filter(f => f.WeightClass === division);
-    }
-    return NextResponse.json(filteredFighters);
+    return NextResponse.json(filterFighters(cachedFighters, id, division));
+  }
+
+  // No cached data or cache is too old and initial fetch is needed
+  console.log(`GET /api/fighters?${queryParamsLog}: No cached data or cache is significantly old. Fetching from API.`);
+  if (!apiKey) {
+    console.error(`GET /api/fighters?${queryParamsLog}: SportsData API key is not configured. Cannot fetch new data.`);
+    // Fallback to mock data if API key is not configured and no cache exists
+    // This was the original behavior, but returning an error might be more consistent.
+    // For now, keeping mock data fallback but with an error log.
+    // Consider returning: return NextResponse.json({ error: "API key not configured server-side.", details: "Cannot fetch fighter data." }, { status: 500 });
+    console.warn(`GET /api/fighters?${queryParamsLog}: API key missing. Serving mock data as fallback.`);
+    return NextResponse.json(filterFighters(mockFighters, id, division));
+  }
+
+  const fetchResult = await fetchFightersFromAPI(apiKey);
+
+  if (fetchResult.data) {
+    // API fetch successful
+    console.log(`GET /api/fighters?${queryParamsLog}: API fetch successful.`);
+    return NextResponse.json(filterFighters(fetchResult.data, id, division));
+  } else if (fetchResult.error) {
+    // API fetch failed, and no prior cache to serve as stale
+    console.error(`GET /api/fighters?${queryParamsLog}: API fetch failed. Error: ${fetchResult.error.message}`, fetchResult.error.details ? fetchResult.error.details : '');
+    // Fallback to mock data on API error as per original logic.
+    // Consider returning the error: return NextResponse.json(fetchResult.error, { status: fetchResult.error.status });
+    console.warn(`GET /api/fighters?${queryParamsLog}: API fetch failed. Serving mock data as fallback.`);
+    return NextResponse.json(filterFighters(mockFighters, id, division));
+  } else {
+    // Should not happen: fetchResult has no data and no error
+    console.error(`GET /api/fighters?${queryParamsLog}: fetchFightersFromAPI returned an unexpected state (no data, no error).`);
+    return NextResponse.json({ error: "An unexpected error occurred while fetching fighter data.", details: "API helper function returned an invalid state." }, { status: 500 });
   }
 }
 
 export async function POST(req: NextRequest) {
+  let userId: string | null = null;
   try {
-    const { userId } = auth();
+    const authResult = auth();
+    userId = authResult.userId;
     
-    // Check if user is authenticated
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      console.warn("POST /api/fighters: Unauthorized access attempt.");
+      return NextResponse.json({ error: "Unauthorized", details: "User authentication required." }, { status: 401 });
+    }
+
+    let data;
+    try {
+      data = await req.json();
+    } catch (parseError: any) {
+      console.warn(`POST /api/fighters: Invalid JSON in request body for userId: ${userId}.`, parseError);
+      return NextResponse.json({ error: "Invalid request body", details: "Request body must be valid JSON." }, { status: 400 });
     }
     
-    // Get fighter data from request body
-    const data = await req.json();
+    // TODO: Add validation for fighter data (e.g., using Zod)
     
-    // Create new fighter
     const fighter = await db.fighter.create({
-      data
+      data // Assumes data is a valid Prisma.FighterCreateInput
     });
     
+    console.log(`POST /api/fighters: Fighter created successfully by userId ${userId}, fighterId ${fighter.id}`);
     return NextResponse.json(fighter, { status: 201 });
-  } catch (error) {
-    console.error("Error creating fighter:", error);
-    return NextResponse.json(
-      { error: "Failed to create fighter" },
-      { status: 500 }
-    );
+  } catch (error: any) {
+    console.error(`POST /api/fighters: Error creating fighter for userId ${userId || 'unknown'}.`, error);
+    // Check for Prisma-specific errors if needed, e.g., unique constraint violation
+    return NextResponse.json({ error: "Failed to create fighter in database.", details: error.message || "An unknown database error occurred." }, { status: 500 });
   }
 }
 
 export async function PUT(req: NextRequest) {
+  let userId: string | null = null;
+  let fighterIdToUpdate: string | null = null;
   try {
-    const { userId } = auth();
+    const authResult = auth();
+    userId = authResult.userId;
     const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
+    fighterIdToUpdate = searchParams.get("id");
     
-    // Check if user is authenticated
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      console.warn(`PUT /api/fighters: Unauthorized access attempt for fighterId ${fighterIdToUpdate || 'unknown'}.`);
+      return NextResponse.json({ error: "Unauthorized", details: "User authentication required." }, { status: 401 });
     }
     
-    // Check if fighter ID is provided
-    if (!id) {
-      return NextResponse.json(
-        { error: "Fighter ID is required" },
-        { status: 400 }
-      );
+    if (!fighterIdToUpdate) {
+      console.warn(`PUT /api/fighters: Fighter ID is missing in query params for userId: ${userId}.`);
+      return NextResponse.json({ error: "Fighter ID is required in query parameters.", details: "Provide 'id' in query params." }, { status: 400 });
     }
     
-    // Get fighter data from request body
-    const data = await req.json();
+    let data;
+    try {
+      data = await req.json();
+    } catch (parseError: any) {
+      console.warn(`PUT /api/fighters: Invalid JSON in request body for userId: ${userId}, fighterId: ${fighterIdToUpdate}.`, parseError);
+      return NextResponse.json({ error: "Invalid request body", details: "Request body must be valid JSON." }, { status: 400 });
+    }
+
+    // TODO: Add validation for fighter data
     
-    // Update fighter
     const fighter = await db.fighter.update({
-      where: { id },
-      data
+      where: { id: fighterIdToUpdate },
+      data // Assumes data is a valid Prisma.FighterUpdateInput
     });
     
+    console.log(`PUT /api/fighters: Fighter ${fighterIdToUpdate} updated successfully by userId ${userId}.`);
     return NextResponse.json(fighter);
-  } catch (error) {
-    console.error("Error updating fighter:", error);
-    return NextResponse.json(
-      { error: "Failed to update fighter" },
-      { status: 500 }
-    );
+  } catch (error: any) {
+    // Check for Prisma P2025 (Record to update not found)
+    if (error.code === 'P2025') {
+        console.warn(`PUT /api/fighters: Fighter not found for update. fighterId: ${fighterIdToUpdate}, userId: ${userId}.`, error);
+        return NextResponse.json({ error: "Fighter not found", details: `Fighter with ID ${fighterIdToUpdate} not found.` }, { status: 404 });
+    }
+    console.error(`PUT /api/fighters: Error updating fighter ${fighterIdToUpdate || 'unknown'} for userId ${userId || 'unknown'}.`, error);
+    return NextResponse.json({ error: "Failed to update fighter in database.", details: error.message || "An unknown database error occurred." }, { status: 500 });
   }
 }
 
 export async function DELETE(req: NextRequest) {
+  let userId: string | null = null;
+  let fighterIdToDelete: string | null = null;
   try {
-    const { userId } = auth();
+    const authResult = auth();
+    userId = authResult.userId;
     const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
+    fighterIdToDelete = searchParams.get("id");
     
-    // Check if user is authenticated
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      console.warn(`DELETE /api/fighters: Unauthorized access attempt for fighterId ${fighterIdToDelete || 'unknown'}.`);
+      return NextResponse.json({ error: "Unauthorized", details: "User authentication required." }, { status: 401 });
     }
     
-    // Check if fighter ID is provided
-    if (!id) {
-      return NextResponse.json(
-        { error: "Fighter ID is required" },
-        { status: 400 }
-      );
+    if (!fighterIdToDelete) {
+      console.warn(`DELETE /api/fighters: Fighter ID is missing in query params for userId: ${userId}.`);
+      return NextResponse.json({ error: "Fighter ID is required in query parameters.", details: "Provide 'id' in query params." }, { status: 400 });
     }
     
-    // Delete fighter
     await db.fighter.delete({
-      where: { id }
+      where: { id: fighterIdToDelete }
     });
     
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Error deleting fighter:", error);
-    return NextResponse.json(
-      { error: "Failed to delete fighter" },
-      { status: 500 }
-    );
+    console.log(`DELETE /api/fighters: Fighter ${fighterIdToDelete} deleted successfully by userId ${userId}.`);
+    return NextResponse.json({ success: true, message: `Fighter with ID ${fighterIdToDelete} deleted successfully.` });
+  } catch (error: any) {
+     // Check for Prisma P2025 (Record to delete not found)
+    if (error.code === 'P2025') {
+        console.warn(`DELETE /api/fighters: Fighter not found for deletion. fighterId: ${fighterIdToDelete}, userId: ${userId}.`, error);
+        return NextResponse.json({ error: "Fighter not found", details: `Fighter with ID ${fighterIdToDelete} not found.` }, { status: 404 });
+    }
+    console.error(`DELETE /api/fighters: Error deleting fighter ${fighterIdToDelete || 'unknown'} for userId ${userId || 'unknown'}.`, error);
+    return NextResponse.json({ error: "Failed to delete fighter from database.", details: error.message || "An unknown database error occurred." }, { status: 500 });
   }
 }

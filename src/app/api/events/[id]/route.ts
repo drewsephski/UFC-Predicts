@@ -7,8 +7,14 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const eventId = params.id;
   try {
-    const id = params.id;
+    if (!eventId) {
+      // This case should ideally not be hit given the route structure [id]
+      // but adding for robustness and explicit logging.
+      console.warn("GET /api/events/[id]: Event ID is missing in request params.");
+      return NextResponse.json({ error: 'Event ID is required in the path.' }, { status: 400 });
+    }
 
     const event: Prisma.EventGetPayload<{
       include: {
@@ -20,7 +26,7 @@ export async function GET(
         };
       };
     }> | null = await db.event.findUnique({
-      where: { id },
+      where: { id: eventId },
       include: {
         fights: {
           include: {
@@ -35,8 +41,9 @@ export async function GET(
     });
 
     if (!event) {
+      console.log(`GET /api/events/${eventId}: Event not found in database.`);
       return NextResponse.json(
-        { error: "Event not found" },
+        { error: "Event not found", details: `No event found with ID ${eventId}` },
         { status: 404 }
       );
     }
@@ -67,10 +74,10 @@ export async function GET(
     };
 
     return NextResponse.json(formattedEvent);
-  } catch (error) {
-    console.error("Error fetching event:", error);
+  } catch (error: any) {
+    console.error(`GET /api/events/${eventId}: Error fetching event.`, error);
     return NextResponse.json(
-      { error: "Failed to fetch event" },
+      { error: "Failed to fetch event from database.", details: error.message || "An unknown database error occurred." },
       { status: 500 }
     );
   }

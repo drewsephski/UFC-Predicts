@@ -6,8 +6,13 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const fighterId = params.id;
   try {
-    const fighterId = params.id;
+    if (!fighterId) {
+      // This case should ideally not be hit given the route structure [id]
+      console.warn("GET /api/fighters/[id]/fights: Fighter ID is missing in request params.");
+      return NextResponse.json({ error: 'Fighter ID is required in the path.' }, { status: 400 });
+    }
     
     // Verify fighter exists
     const fighter = await db.fighter.findUnique({
@@ -15,8 +20,9 @@ export async function GET(
     });
     
     if (!fighter) {
+      console.log(`GET /api/fighters/${fighterId}/fights: Fighter not found in database.`);
       return NextResponse.json(
-        { error: "Fighter not found" },
+        { error: "Fighter not found", details: `No fighter found with ID ${fighterId}` },
         { status: 404 }
       );
     }
@@ -45,10 +51,13 @@ export async function GET(
     });
     
     return NextResponse.json(fights);
-  } catch (error) {
-    console.error("Error fetching fighter fights:", error);
+  } catch (error: any) {
+    console.error(`GET /api/fighters/${fighterId}/fights: Error fetching fights for fighter.`, error);
     return NextResponse.json(
-      { error: "Failed to fetch fighter fights" },
+      {
+        error: "Failed to fetch fighter fights from database.",
+        details: error.message || "An unknown database error occurred."
+      },
       { status: 500 }
     );
   }

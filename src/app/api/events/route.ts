@@ -60,10 +60,14 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(formattedEvents);
-  } catch (error) {
-    console.error("Error fetching events:", error);
+  } catch (error: any) {
+    const queryParams = req.nextUrl.searchParams.toString();
+    console.error(`GET /api/events?${queryParams}: Error fetching events.`, error);
     return NextResponse.json(
-      { error: "Failed to fetch events" },
+      {
+        error: "Failed to fetch events from database.",
+        details: error.message || "An unknown database error occurred."
+      },
       { status: 500 }
     );
   }

@@ -30,16 +30,19 @@ export async function GET(request: Request) {
   const fightId = searchParams.get('fightId');
 
   const apiKey = process.env.RAPIDAPI_KEY;
+  const queryParamsLog = `fightId=${fightId || 'all'}`;
+
 
   if (!apiKey) {
-    return NextResponse.json({ error: 'API key is not configured' }, { status: 500 });
+    console.error(`GET /api/live?${queryParamsLog}: RAPIDAPI_KEY is not configured.`);
+    return NextResponse.json({ error: 'API key is not configured server-side. Cannot fetch live stats.' }, { status: 500 });
   }
 
   // The MMA API documentation doesn't specify a dedicated endpoint for live stats.
   // Assuming a generic endpoint or one that might require a fightId.
   // This URL might need adjustment based on the actual API capabilities.
   const baseUrl = 'https://mmaapi.p.rapidapi.com/api/mma/live';
-  const url = fightId ? `${baseUrl}?fightId=${fightId}` : baseUrl;
+  const url = fightId ? `${baseUrl}?fightId=${fightId}` : baseUrl; // Note: API might not support fightId query for this general endpoint
 
   const options = {
     method: 'GET',
@@ -51,15 +54,24 @@ export async function GET(request: Request) {
 
   try {
     const response = await fetch(url, options);
-    const result = await response.json();
 
     if (!response.ok) {
-      return NextResponse.json({ error: 'Failed to fetch live fight stats', details: result }, { status: response.status });
+      const errorResult = await response.text(); // Use text() to avoid JSON parse error if response is not JSON
+      console.error(`GET /api/live?${queryParamsLog}: Failed to fetch live stats from external API. Status: ${response.status}, Body: ${errorResult}`);
+      return NextResponse.json({
+        error: 'Failed to fetch live fight stats from external provider.',
+        details: `External API responded with status ${response.status}.`
+      }, { status: response.status > 499 ? 502 : response.status }); // 502 Bad Gateway for server-side errors from upstream
     }
 
+    const result = await response.json();
     return NextResponse.json(result);
-  } catch (error) {
-    console.error('Error fetching live fight stats:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+
+  } catch (error: any) { // Explicitly type error
+    console.error(`GET /api/live?${queryParamsLog}: An unexpected error occurred.`, error);
+    return NextResponse.json({
+      error: 'Internal server error while fetching live fight stats.',
+      details: error.message || 'An unknown error occurred'
+    }, { status: 500 });
   }
 }
