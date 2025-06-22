@@ -1,0 +1,139 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "regions": ["iad1", "sfo1", "lhr1"],
+  "crons": [
+    {
+      "path": "/api/cron/sync-data",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/sync-data?dataType=rankings",
+      "schedule": "0 */4 * * *"
+    },
+    {
+      "path": "/api/cron/sync-data?dataType=news",
+      "schedule": "*/30 * * * *"
+    }
+  ],
+  "functions": {
+    "src/app/api/fighters/route.ts": {
+      "memory": 1024,
+      "maxDuration": 10
+    },
+    "src/app/api/events/route.ts": {
+      "memory": 1024,
+      "maxDuration": 10
+    },
+    "src/app/api/fights/route.ts": {
+      "memory": 1024,
+      "maxDuration": 10
+    },
+    "src/app/api/live/events/route.ts": {
+      "memory": 3008,
+      "maxDuration": 60
+    },
+    "src/app/api/cron/sync-data/route.ts": {
+      "memory": 3008,
+      "maxDuration": 300
+    },
+    "src/app/api/predict/[fightId]/route.ts": {
+      "memory": 2048,
+      "maxDuration": 15
+    }
+  },
+  "headers": [
+    {
+      "source": "/fonts/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/images/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
+        }
+      ]
+    },
+    {
+      "source": "/api/fighters",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, stale-while-revalidate=86400"
+        }
+      ]
+    },
+    {
+      "source": "/api/events",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=1800, stale-while-revalidate=86400"
+        }
+      ]
+    },
+    {
+      "source": "/api/live/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
+      ]
+    }
+  ],
+  "env": {
+    "NEXT_PUBLIC_BASE_PATH": "/UFC-Predicts",
+    "ENABLE_CACHE": "true",
+    "VERCEL_CRON": "1",
+    "DISABLE_WEB_SCRAPING": {
+      "development": "false",
+      "preview": "false",
+      "production": "false"
+    }
+  },
+  "build": {
+    "env": {
+      "ANALYZE": "false"
+    }
+  },
+  "images": {
+    "domains": ["ufc.com", "static.ufc.com", "media.ufcstats.com"],
+    "formats": ["image/avif", "image/webp"]
+  }
+}

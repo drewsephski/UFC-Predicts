@@ -32,25 +32,20 @@ export const mockUpcomingFights: Fight[] = [
   // Add more mock fights as needed
 ];
 
-// Simulate API calls with delay
-const simulateAPIDelay = <T>(data: T, delay = 500): Promise<T> => {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(data), delay);
-  });
-};
-
 export const getFighters = async (): Promise<Fighter[]> => {
   // In a real app, you would fetch from your API:
   // const response = await fetch('/api/fighters');
   // return response.json();
-  return simulateAPIDelay(mockFighters);
+  // Return mock data immediately (no artificial delay)
+  return mockFighters;
 };
 
 export const getUpcomingFights = async (): Promise<Fight[]> => {
   // In a real app, you would fetch from your API:
   // const response = await fetch('/api/upcoming-fights');
   // return response.json();
-  return simulateAPIDelay(mockUpcomingFights);
+  // Return mock data immediately (no artificial delay)
+  return mockUpcomingFights;
 };
 
 export const getFighterById = async (id: string): Promise<Fighter | undefined> => {
