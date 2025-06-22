@@ -4,23 +4,30 @@ UFC Predicts is an application designed to provide predictions and statistics fo
 
 ## 🌟 Features
 
-- **Fighter Profiles:** Detailed statistics and information for UFC fighters.
-- **Event Tracking:** Information on upcoming and past UFC events.
-- **Fight Predictions:** Data-driven predictions for fight outcomes.
-- **Matchup Analysis:** Compare fighters head-to-head.
-- **User Accounts:** Sign up to save favorite fighters and track your prediction accuracy.
-- **Modern UI:** Built with a sleek red and black theme using Tailwind CSS and Shadcn UI.
+- **Fighter Profiles:** Detailed statistics and information for UFC fighters, refreshed hourly from SportsData.io and UFC.com.
+- **Live Rankings:** Official UFC rankings scraped hourly and cached for instant access.
+- **Event Tracking:** Upcoming & past UFC events automatically refreshed every hour.
+- **Live Fight Centre:** Real-time win-probability, strike and grappling stats streamed via Server-Sent Events (SSE).
+- **Fight Predictions:** Logistic-regression model produces probability distributions for each matchup.
+- **Matchup Analysis:** Compare fighters head-to-head with interactive charts.
+- **User Accounts:** Sign up with Clerk to save favourites and track your prediction accuracy.
+- **Modern UI:** Tailwind CSS + Shadcn UI + Framer Motion for slick animations.
+- **Offline Fallback:** Mock data kicks-in if external APIs are unavailable.
 
 ## 💻 Tech Stack
 
-- **Framework:** Next.js (App Router)
-- **Styling:** Tailwind CSS, Shadcn UI, Magic UI
-- **Database:** Prisma (with a database like PostgreSQL or MySQL - specify if known)
-- **Authentication:** Clerk
-- **Data Fetching/State Management:** React Hooks, SWR/React Query (specify if used)
-- **Language:** TypeScript
-
-## 🛠️ Getting Started
+| Layer | Library |
+|-------|---------|
+| Framework | **Next.js 14 (App Router)** |
+| Styling | Tailwind CSS • Shadcn UI • Magic UI |
+| DB / ORM | MongoDB Atlas • Prisma |
+| Auth | Clerk |
+| Data-fetching | **SWR** + server Route Handlers |
+| Real-time | Node **SSE** streams |
+| Scraping | **Cheerio** (UFC.com), SportsData.io SDK |
+| Caching | **Upstash Redis** (with LRU memory fallback) |
+| Tooling | @next/bundle-analyzer • Vercel Analytics |
+| Language | **TypeScript** |
 
 To run UFC Predicts locally, follow these steps:
 
@@ -39,7 +46,7 @@ To run UFC Predicts locally, follow these steps:
     ```
 
 3. **Set up environment variables:**
-    Create a `.env` file in the root of the project and add the necessary environment variables. Refer to `.env.example` if available, or ensure you have:
+    Copy `.env.example` ➡️ `.env.local` and fill in the blanks. _Minimal keys for local dev_:
 
     ```env
     # Clerk Authentication
@@ -53,8 +60,15 @@ To run UFC Predicts locally, follow these steps:
     # Prisma Database (Example for PostgreSQL)
     DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
 
-    # SportsDataIO API Key (if used for fetching data)
-    # SPORTSDATA_IO_API_KEY=
+    # SportsData.io
+    SPORTSDATA_API_KEY=
+
+    # RapidAPI UFC Data (live stats fallback)
+    RAPIDAPI_KEY=
+
+    # Upstash Redis (edge caching)
+    UPSTASH_REDIS_REST_URL=
+    UPSTASH_REDIS_REST_TOKEN=
 
     # NextAuth.js (if used - though Clerk is listed above)
     # NEXTAUTH_URL=
@@ -79,6 +93,13 @@ To run UFC Predicts locally, follow these steps:
 ## 🚀 Deployment
 
 This project is configured to be deployed to both GitHub Pages and Netlify.
+
+### Vercel
+
+1. Import the repository in Vercel → “New Project”.
+2. Add environment variables from `.env.local`.
+3. Build Command `npm run build`, Output `out`.
+4. **Cron Jobs:** `vercel.json` already schedules `/api/cron/sync-data` hourly.
 
 ### GitHub Pages
 
@@ -106,6 +127,39 @@ This project is configured to be deployed to both GitHub Pages and Netlify.
    npm install -g netlify-cli
    ```
 2. Log in to Netlify:
+## ⚡ Performance & Optimisations
+
+- **Bundle-analysis:** `npm run analyze` surfaces heavy modules; dynamic imports applied to marketing pages.
+- **Code-splitting:** Below-the-fold components load lazily via `next/dynamic` + IntersectionObserver.
+- **Image-optimisation:** `next/image` serves AVIF/WebP with blurred placeholders.
+- **Database Indexes:** Prisma generates compound indexes for common filters (division, event date).
+- **Static / ISR:** Marketing pages are static; data-heavy pages use ISR backed by Redis.
+
+## 🗄️ Caching
+
+Upstash Redis stores JSON responses under keys like `ufc:fighters`, `ufc:events:upcoming`, etc.  
+TTL defaults: fighters 24 h, events 1 h, live data 1 min.  
+Automatic fallback to in-memory LRU cache if Redis isn’t configured.
+
+## 🔔 Real-time Updates
+
+`/api/live/events` exposes SSE:
+
+```ts
+const ev = new EventSource('/api/live/events?fightId=123');
+ev.onmessage = e => console.log(JSON.parse(e.data));
+```
+
+Data refresh is handled by `/api/cron/sync-data` (hourly via Vercel Cron) which invalidates Redis keys and re-hydrates fresh data.
+
+## 🚑 Troubleshooting
+
+| Symptom | Fix |
+|---------|-----|
+| `503 Too many connections` from `/api/live/events` | Reduce clients or raise `MAX_CONNECTIONS` env. |
+| Empty rankings | Ensure `DISABLE_WEB_SCRAPING=false` and check firewall blocks. |
+| Stale data | `POST /api/cron/sync-data` with `Authorization: Bearer <CRON_SECRET>` to force refresh. |
+
    ```bash
    netlify login
    ```

@@ -1,9 +1,25 @@
+/** *********************************************************************
+ * Global Next.js configuration
+ *  – Adds bundle-analysis support            (yarn analyze / npm run analyze)
+ *  – Keeps GitHub-Pages static-export setup  (basePath / assetPrefix)
+ *  – Enables extra performance features      (gzip, CSS optim)
+ *  – Improves image handling (modern formats, remote domains)
+ ********************************************************************* */
+
 /** @type {import('next').NextConfig} */
 const isProd = process.env.NODE_ENV === 'production';
+
+// Lazy-load bundle-analyser only when requested (`ANALYZE=true`)
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
 
 const nextConfig = {
   // Enable React Strict Mode for better development experience
   reactStrictMode: true,
+
+  // Enable gzip compression for rendered responses (default = true, set explicitly)
+  compress: true,
 
   // Configure base path for GitHub Pages deployment
   basePath: isProd ? '/UFC-Predicts' : '',
@@ -14,7 +30,14 @@ const nextConfig = {
 
   // Configure image optimization
   images: {
-    unoptimized: true, // Required for static export
+    // Static export for GH-Pages still needs unoptimized images,
+    // but keep modern formats & remote domains for local/server deployments.
+    ...(isProd ? { unoptimized: true } : {}),
+    formats: ['image/avif', 'image/webp'],
+    // Remote images we expect to use (UFC official assets, etc.)
+    domains: ['ufc.com', 'static.ufc.com', 'media.ufcstats.com'],
+    // Cache TTL (seconds) for optimized images
+    minimumCacheTTL: 60,
   },
 
   // Environment variables
@@ -24,6 +47,11 @@ const nextConfig = {
 
   // Enable source maps in production for debugging
   productionBrowserSourceMaps: true,
+
+  // Small SWC / build-time optimisations
+  experimental: {
+    optimizeCss: true,
+  },
 
   // Webpack configuration
   webpack: (config, { isServer }) => {
@@ -69,4 +97,5 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+// Wrap with bundle analyzer (no-op unless ANALYZE=true)
+module.exports = withBundleAnalyzer(nextConfig);

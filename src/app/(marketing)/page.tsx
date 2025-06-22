@@ -1,11 +1,64 @@
 'use client';
 
-import { Companies, Connect, Container, CTA, Features, Hero, Perks, Pricing, Reviews, Wrapper } from "@/components";
+import dynamic from "next/dynamic";
+import { Connect, Container, Features, Hero, Perks, Wrapper } from "@/components";
 import Background from "@/components/global/background";
 import { Spotlight } from "@/components/ui/spotlight";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useState } from "react";
 import { useEnhancedSmoothScroll } from "@/hooks";
+
+/* ------------------------------------------------------------------ */
+/* Dynamically-loaded, below-the-fold components                      */
+/* ------------------------------------------------------------------ */
+
+const Companies = dynamic(() => import("@/components").then(m => m.Companies), {
+  loading: () => <div className="h-24 w-full animate-pulse bg-muted/30 rounded-md" />,
+});
+
+const Pricing = dynamic(() => import("@/components").then(m => m.Pricing), {
+  loading: () => <div className="h-64 w-full animate-pulse bg-muted/30 rounded-md" />,
+});
+
+const Reviews = dynamic(() => import("@/components").then(m => m.Reviews), {
+  loading: () => <div className="h-64 w-full animate-pulse bg-muted/30 rounded-md" />,
+});
+
+const CTA = dynamic(() => import("@/components").then(m => m.CTA), {
+  loading: () => <div className="h-40 w-full animate-pulse bg-muted/30 rounded-md" />,
+});
+
+/* ------------------------------------------------------------------ */
+/* LazyRender – mounts children only when section enters viewport     */
+/* ------------------------------------------------------------------ */
+
+const LazyRender = ({
+  children,
+  rootMargin = "200px",
+}: {
+  children: React.ReactNode;
+  rootMargin?: string;
+}) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (!ref.current || visible) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin }
+    );
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [visible, rootMargin]);
+
+  return <div ref={ref}>{visible ? children : null}</div>;
+};
 
 const HomePage = () => {
   const containerRef = useRef<HTMLElement>(null);
@@ -77,7 +130,9 @@ const HomePage = () => {
 
         <Container className="py-8 lg:py-20">
           <section id="companies" className="scroll-mt-20">
-            <Companies />
+            <LazyRender>
+              <Companies />
+            </LazyRender>
           </section>
         </Container>
 
@@ -97,17 +152,23 @@ const HomePage = () => {
 
         <section id="pricing" className="relative py-20 scroll-mt-20">
           <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background via-background/50 to-background" />
-          <Pricing />
+          <LazyRender>
+            <Pricing />
+          </LazyRender>
         </section>
 
         <section id="reviews" className="relative py-20 scroll-mt-20">
           <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background/50 via-background to-background/50" />
-          <Reviews />
+          <LazyRender>
+            <Reviews />
+          </LazyRender>
         </section>
 
         <section id="cta" className="relative scroll-mt-20">
           <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background via-background/50 to-background" />
-          <CTA />
+          <LazyRender rootMargin="0px">
+            <CTA />
+          </LazyRender>
         </section>
 
         {/* Scroll progress indicator */}
